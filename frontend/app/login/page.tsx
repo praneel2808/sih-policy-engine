@@ -52,14 +52,16 @@ export default function LoginPage() {
 
         {/* Portal Header */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center mx-auto mb-3 shadow-sm border border-slate-700">
-            <svg className="w-6 h-6 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm0 2.18l6 2.25v4.66c0 4.1-2.67 7.94-6 9-3.33-1.06-6-4.9-6-9V6.43l6-2.25zM11 7v2h2V7h-2zm0 4v6h2v-6h-2z" />
-            </svg>
+          <div className="w-28 h-28 rounded-3xl bg-slate-900/95 flex items-center justify-center mx-auto mb-4 shadow-xl border border-slate-700/80 p-3 ring-4 ring-slate-800/20">
+            <img
+              src="/maharashtra-emblem.png"
+              alt="Government of Maharashtra Official Emblem"
+              className="w-full h-full object-contain drop-shadow-md"
+            />
           </div>
-          <p className="text-slate-500 text-[11px] tracking-widest uppercase font-semibold">Government of Maharashtra</p>
-          <h1 className="text-slate-800 font-bold text-xl tracking-tight mt-0.5">Unified Industrial Approval System</h1>
-          <p className="text-slate-500 text-xs mt-1">Single Window Clearance & Regulatory Portal</p>
+          <p className="text-slate-700 text-base tracking-wider uppercase font-extrabold">Government of Maharashtra</p>
+          <h1 className="text-slate-900 font-black text-2xl tracking-tight mt-1">Unified Industrial Approval System</h1>
+          <p className="text-slate-500 text-sm mt-1 font-medium">Single Window Clearance & Regulatory Portal</p>
         </div>
 
         {/* Login Card - Soft comfortable slate & subtle border */}
@@ -78,7 +80,7 @@ export default function LoginPage() {
                 autoFocus
                 value={username}
                 onChange={(e) => { setUsername(e.target.value); setError(''); }}
-                placeholder="sih130"
+                placeholder="username"
                 className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/40 bg-slate-50/50 text-slate-800"
               />
             </div>
@@ -93,7 +95,7 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                  placeholder="uias130@"
+                  placeholder="password"
                   className="w-full border border-slate-300 rounded-lg px-3 py-2 pr-12 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/40 bg-slate-50/50 text-slate-800"
                 />
                 <button
@@ -124,7 +126,7 @@ export default function LoginPage() {
 
           {/* Quick Credential Helper Button */}
           <div className="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-500 text-[11px]">Authorized: <code className="text-slate-700 font-mono">sih130</code></span>
+            <span className="text-slate-500 text-[11px]">Authorized: <code className="text-slate-700 font-mono">username</code></span>
             <button
               type="button"
               onClick={quickFill}

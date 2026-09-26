@@ -2,6 +2,8 @@
 title SMSWS Policy Engine Launcher
 cd /d "%~dp0"
 
+set "PATH=%LOCALAPPDATA%\Programs\nodejs;%LOCALAPPDATA%\Programs\Python\Python311;%LOCALAPPDATA%\Programs\Python\Python311\Scripts;%PATH%"
+
 echo ==================================================
 echo  Starting SMSWS Policy Engine Backend and Frontend
 echo ==================================================
