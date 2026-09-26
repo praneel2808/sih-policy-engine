@@ -45,6 +45,35 @@ export async function healthCheck(): Promise<{ status: string; db_exists: boolea
   return res.json();
 }
 
+export async function getDbHealth(): Promise<{
+  status: string;
+  documents: number;
+  extracted: number;
+  chunks: number;
+  candidate_rules: number;
+  canonical_rules: number;
+  form_requirements: number;
+}> {
+  const res = await fetch(`${API_BASE}/api/health/db`);
+  if (!res.ok) throw new Error("Could not fetch DB health");
+  return res.json();
+}
+
+export async function getCanonicalRules(sector?: string, limit = 50): Promise<{ total: number; rules: any[] }> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (sector) params.set("sector", sector);
+  const res = await fetch(`${API_BASE}/api/canonical-rules?${params.toString()}`);
+  if (!res.ok) throw new Error("Could not load canonical rules");
+  return res.json();
+}
+
+export async function getDocuments(limit = 50): Promise<{ total: number; documents: any[] }> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  const res = await fetch(`${API_BASE}/api/documents?${params.toString()}`);
+  if (!res.ok) throw new Error("Could not load documents");
+  return res.json();
+}
+
 // ── Static data ───────────────────────────────────────────────────────────────
 
 export const NIC_SUGGESTIONS = [

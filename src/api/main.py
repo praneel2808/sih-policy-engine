@@ -183,6 +183,63 @@ def get_forms(
     return [FormRequirement.from_row(dict(row)) for row in rows]
 
 
+@app.get("/api/canonical-rules")
+def get_canonical_rules(
+    sector: Optional[str] = Query(None, description="Filter by sector keyword"),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+) -> dict:
+    """Return canonical rules list with criteria and incentives."""
+    if not os.path.exists(DB_PATH):
+        raise HTTPException(status_code=503, detail="Database not available")
+    conn = _get_conn()
+    try:
+        base_query = """
+            SELECT
+                canonical_rule_id, rule_name, policy_sector, normalized_name,
+                eligibility_criteria_json, incentive_details_json,
+                effective_date, expiry_date, confidence, source_count, has_form_requirement, form_count
+            FROM canonical_rules
+        """
+        params: list = []
+        if sector:
+            base_query += " WHERE LOWER(policy_sector) LIKE ?"
+            params.append(f"%{sector.lower()}%")
+        base_query += " ORDER BY source_count DESC, confidence DESC LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
+        rows = conn.execute(base_query, params).fetchall()
+        total = conn.execute("SELECT COUNT(*) FROM canonical_rules").fetchone()[0]
+    finally:
+        conn.close()
+    return {"total": total, "rules": [dict(r) for r in rows]}
+
+
+@app.get("/api/documents")
+def get_documents(
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+) -> dict:
+    """Return document corpus inventory."""
+    if not os.path.exists(DB_PATH):
+        raise HTTPException(status_code=503, detail="Database not available")
+    conn = _get_conn()
+    try:
+        rows = conn.execute(
+            """
+            SELECT document_id, filename, source_url, page_count, file_size_bytes,
+                   language_detected, processing_status, created_at
+            FROM documents
+            ORDER BY page_count DESC
+            LIMIT ? OFFSET ?
+            """,
+            (limit, offset),
+        ).fetchall()
+        total = conn.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
+    finally:
+        conn.close()
+    return {"total": total, "documents": [dict(r) for r in rows]}
+
+
 @app.get("/api/health/db")
 def db_health() -> dict:
     """Detailed DB health with document and rule counts."""

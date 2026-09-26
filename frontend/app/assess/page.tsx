@@ -3,11 +3,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import AppLayout from '@/components/AppLayout';
 import type { ApplicantProfile, EntityType, Sector, LocationType, ProjectStage } from '@/types';
 import { DEMO_TEXTILE, DEMO_EV } from '@/types';
 import { submitAssessment, DISTRICTS } from '@/lib/api';
 
-// ── Constants ──────────────────────────────────────────────────────────────────
 const ENTITY_TYPES: EntityType[] = ['Company', 'LLP', 'Proprietorship'];
 const SECTORS: Sector[] = [
   'Textile', 'EV / Automotive', 'Electronics', 'Chemical', 'Engineering',
@@ -19,24 +19,23 @@ const PROJECT_STAGES: ProjectStage[] = [
 ];
 
 const STAGE_DESC: Record<ProjectStage, string> = {
-  'Pre-establishment': 'Planning / land not yet acquired',
-  'Construction': 'Site acquired, construction underway',
-  'Operational': 'Production has commenced',
-  'Expansion': 'Existing unit expanding capacity',
+  'Pre-establishment': 'Planning / site evaluation / seeking initial statutory approvals',
+  'Construction': 'Site acquired, civil works / infrastructure construction in progress',
+  'Operational': 'Production commenced / factory operating',
+  'Expansion': 'Existing operational enterprise expanding fixed capacity or line',
 };
 
-// ── Small helpers ─────────────────────────────────────────────────────────────
 function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
       {children}
-      {required && <span className="text-red-500 ml-1">*</span>}
+      {required && <span className="text-red-500 ml-1 font-bold">*</span>}
     </label>
   );
 }
 
 function FieldHint({ children }: { children: React.ReactNode }) {
-  return <p className="mt-1 text-xs text-gray-400">{children}</p>;
+  return <p className="mt-1 text-[11px] text-slate-500">{children}</p>;
 }
 
 function FieldError({ msg }: { msg?: string }) {
@@ -44,46 +43,6 @@ function FieldError({ msg }: { msg?: string }) {
   return <p className="mt-1 text-xs text-red-600 font-medium">{msg}</p>;
 }
 
-function SectionCard({
-  title,
-  icon,
-  children,
-  className = '',
-}: {
-  title: string;
-  icon: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden ${className}`}>
-      <div className="bg-blue-50 border-b border-blue-100 px-6 py-3 flex items-center gap-2">
-        <span className="text-lg">{icon}</span>
-        <h2 className="font-bold text-blue-900 text-sm tracking-tight">{title}</h2>
-      </div>
-      <div className="p-6 space-y-5">{children}</div>
-    </div>
-  );
-}
-
-function textInput(
-  value: string | number | undefined,
-  onChange: (v: string) => void,
-  opts: { placeholder?: string; type?: string; min?: number }
-) {
-  return (
-    <input
-      type={opts.type ?? 'text'}
-      min={opts.min}
-      placeholder={opts.placeholder}
-      value={value ?? ''}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-    />
-  );
-}
-
-// ── Main component ────────────────────────────────────────────────────────────
 function AssessInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -93,20 +52,21 @@ function AssessInner() {
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Load demo on mount from ?demo= query param
   useEffect(() => {
     const demo = searchParams.get('demo');
     if (demo === 'textile') {
       setProfile(DEMO_TEXTILE);
       setIsDemoMode(true);
+      setShowAdvanced(true);
     } else if (demo === 'ev') {
       setProfile(DEMO_EV);
       setIsDemoMode(true);
+      setShowAdvanced(true);
     }
   }, [searchParams]);
 
-  // ── Field update ───────────────────────────────────────────────────────────
   function set<K extends keyof ApplicantProfile>(key: K, value: ApplicantProfile[K]) {
     setProfile((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => {
@@ -117,11 +77,11 @@ function AssessInner() {
     if (isDemoMode) setIsDemoMode(false);
   }
 
-  // ── Demo load ──────────────────────────────────────────────────────────────
   function loadDemo(type: 'textile' | 'ev') {
     const demo = type === 'textile' ? DEMO_TEXTILE : DEMO_EV;
     setProfile(demo);
     setIsDemoMode(true);
+    setShowAdvanced(true);
     setErrors({});
     setSubmitError(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -132,10 +92,10 @@ function AssessInner() {
     setErrors({});
     setSubmitError(null);
     setIsDemoMode(false);
+    setShowAdvanced(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ── Validation ─────────────────────────────────────────────────────────────
   function validate(): boolean {
     const errs: Record<string, string> = {};
     if (!profile.entity_type) errs.entity_type = 'Entity type is required.';
@@ -153,7 +113,6 @@ function AssessInner() {
     return Object.keys(errs).length === 0;
   }
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
   async function handleSubmit() {
     if (!validate()) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -168,399 +127,429 @@ function AssessInner() {
       localStorage.setItem('smsws_demo', isDemoMode ? '1' : '0');
       router.push('/results');
     } catch (err: unknown) {
-      setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please check API server.');
       setLoading(false);
     }
   }
 
   const hasErrors = Object.keys(errors).length > 0;
 
-  // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      {/* Top bar */}
-      <div className="bg-blue-900 text-white py-3 px-6 sticky top-0 z-20 shadow-md">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="text-blue-300 hover:text-white text-sm transition-colors">
-              ← Home
-            </Link>
-            <span className="text-blue-600">|</span>
-            <span className="text-white font-semibold text-sm tracking-tight">
-              Project Assessment
-            </span>
+    <AppLayout>
+      <div className="max-w-4xl mx-auto space-y-6">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
+              <Link href="/" className="hover:text-blue-600">Dashboard</Link>
+              <span>/</span>
+              <span className="text-slate-800 font-semibold">Project Assessment</span>
+            </div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+              Single Window Project Profile & Assessment
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Evaluates statutory clearance pathways, department requirements, and state incentive eligibility.
+            </p>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Quick Demo Selector */}
+          <div className="flex items-center gap-2 shrink-0">
             <button
+              type="button"
               onClick={() => loadDemo('textile')}
-              className="text-xs px-3 py-1.5 bg-orange-500 hover:bg-orange-400 text-white font-bold rounded-lg transition-colors"
+              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs rounded-lg transition-colors"
             >
-              ⚡ Textile Demo
+              Demo: Textile
             </button>
             <button
+              type="button"
               onClick={() => loadDemo('ev')}
-              className="text-xs px-3 py-1.5 bg-orange-500/80 hover:bg-orange-400 text-white font-semibold rounded-lg transition-colors"
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs rounded-lg transition-colors"
             >
-              ⚡ EV Demo
+              Demo: EV Mfg
             </button>
-            {(Object.keys(profile).length > 0) && (
+            {Object.keys(profile).length > 0 && (
               <button
+                type="button"
                 onClick={resetForm}
-                className="text-xs px-3 py-1.5 border border-blue-400 text-blue-200 hover:bg-blue-800 rounded-lg transition-colors"
+                className="px-2.5 py-1.5 border border-slate-300 text-slate-600 hover:bg-slate-100 text-xs rounded-lg transition-colors"
               >
                 Reset
               </button>
             )}
           </div>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-
-        {/* Demo mode banner */}
+        {/* Demo Data Notice */}
         {isDemoMode && (
-          <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-amber-50 border-2 border-amber-300 shadow-sm">
-            <span className="text-amber-500 text-xl shrink-0">⚡</span>
-            <div className="flex-1">
-              <p className="font-bold text-amber-800 text-sm">DEMO DATA LOADED</p>
-              <p className="text-amber-700 text-xs mt-0.5">
-                This form is pre-filled with a sample industrial project.
-                Click <strong>Assess Project</strong> to run the full assessment, or edit any field to customise.
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-100 border border-slate-300 text-slate-900">
+            <div>
+              <p className="font-bold text-xs text-slate-900">DEMO INDUSTRIAL PROJECT DATA LOADED</p>
+              <p className="text-[11px] text-slate-600 mt-0.5">
+                Pre-filled with verified enterprise profile parameters. Click <strong>Assess Project</strong> to generate statutory report.
               </p>
             </div>
             <button
               onClick={resetForm}
-              className="shrink-0 text-xs text-amber-700 hover:text-amber-900 underline"
+              className="text-xs text-slate-600 hover:text-slate-900 underline font-medium shrink-0 ml-2"
             >
               Clear
             </button>
           </div>
         )}
 
-        {/* Error summary */}
+        {/* Validation Errors */}
         {hasErrors && (
-          <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200">
-            <p className="text-red-700 font-semibold text-sm mb-1">Please fix the following:</p>
+          <div className="p-4 rounded-xl bg-red-50 border border-red-200">
+            <p className="text-red-800 font-semibold text-xs uppercase tracking-wider mb-1">Required Fields Missing:</p>
             <ul className="space-y-0.5">
               {Object.values(errors).map((e, i) => (
-                <li key={i} className="text-red-600 text-xs">• {e}</li>
+                <li key={i} className="text-red-600 text-xs font-medium">• {e}</li>
               ))}
             </ul>
           </div>
         )}
 
-        <div className="space-y-6">
+        {/* Form Sections */}
+        <div className="space-y-5">
 
-          {/* ── Section 1: Enterprise Basics ─────────────────────────────── */}
-          <SectionCard title="Enterprise Basics" icon="🏢">
-
-            <div>
-              <FieldLabel required>Entity Type</FieldLabel>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {ENTITY_TYPES.map((t) => (
-                  <label
-                    key={t}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-colors text-sm font-medium ${
-                      profile.entity_type === t
-                        ? 'border-blue-600 bg-blue-50 text-blue-800'
-                        : 'border-gray-200 text-gray-700 hover:border-blue-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="entity_type"
-                      className="sr-only"
-                      checked={profile.entity_type === t}
-                      onChange={() => set('entity_type', t)}
-                    />
-                    {t}
-                  </label>
-                ))}
-              </div>
-              <FieldError msg={errors.entity_type} />
+          {/* Section 1: Enterprise Profile */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="bg-slate-50 border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+              <h2 className="font-bold text-slate-800 text-sm">1. Enterprise Identity & Basic Details</h2>
+              <span className="text-[11px] font-medium text-slate-400">Core Attribute</span>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            
+            <div className="p-6 space-y-4">
               <div>
-                <FieldLabel required>Entity / Project Name</FieldLabel>
-                {textInput(profile.entity_name, (v) => set('entity_name', v), {
-                  placeholder: 'e.g. Maharashtra Innovations Pvt. Ltd.',
-                })}
-                <FieldError msg={errors.entity_name} />
-              </div>
-              <div>
-                <FieldLabel>PAN (optional)</FieldLabel>
-                {textInput(profile.pan, (v) => set('pan', v), { placeholder: 'e.g. AABCT1234E' })}
-                <FieldError msg={errors.pan} />
-              </div>
-            </div>
-
-          </SectionCard>
-
-          {/* ── Section 2: Industry & Sector ─────────────────────────────── */}
-          <SectionCard title="Industry & Sector" icon="🏭">
-
-            <div>
-              <FieldLabel required>Industry Sector</FieldLabel>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {SECTORS.map((s) => (
-                  <label
-                    key={s}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 cursor-pointer transition-colors text-sm ${
-                      profile.sector === s
-                        ? 'border-blue-600 bg-blue-50 text-blue-800 font-semibold'
-                        : 'border-gray-200 text-gray-700 hover:border-blue-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="sector"
-                      className="sr-only"
-                      checked={profile.sector === s}
-                      onChange={() => set('sector', s as Sector)}
-                    />
-                    {s}
-                  </label>
-                ))}
-              </div>
-              <FieldError msg={errors.sector} />
-            </div>
-
-            <div>
-              <FieldLabel>Product / Activity Description</FieldLabel>
-              <textarea
-                rows={2}
-                placeholder="Describe the main product or industrial activity…"
-                value={profile.product_description ?? ''}
-                onChange={(e) => set('product_description', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-              <FieldHint>Helps match relevant policy keywords and evidence from the knowledge base.</FieldHint>
-            </div>
-
-          </SectionCard>
-
-          {/* ── Section 3: Location ───────────────────────────────────────── */}
-          <SectionCard title="Location" icon="📍">
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <FieldLabel>District</FieldLabel>
-                <select
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={profile.district ?? ''}
-                  onChange={(e) => set('district', e.target.value)}
-                >
-                  <option value="">-- Select district --</option>
-                  {DISTRICTS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-                <FieldHint>District determines incentive zone (A/B/C/D).</FieldHint>
-              </div>
-              <div>
-                <FieldLabel>Taluka (optional)</FieldLabel>
-                {textInput(profile.taluka, (v) => set('taluka', v), { placeholder: 'e.g. Haveli' })}
-              </div>
-            </div>
-
-            <div>
-              <FieldLabel>Location Type</FieldLabel>
-              <div className="flex flex-wrap gap-2">
-                {LOCATION_TYPES.map((lt) => (
-                  <label
-                    key={lt}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-colors text-sm font-medium ${
-                      profile.location_type === lt
-                        ? 'border-blue-600 bg-blue-50 text-blue-800'
-                        : 'border-gray-200 text-gray-700 hover:border-blue-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="location_type"
-                      className="sr-only"
-                      checked={profile.location_type === lt}
-                      onChange={() => set('location_type', lt)}
-                    />
-                    {lt}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-          </SectionCard>
-
-          {/* ── Section 4: Project Scale ──────────────────────────────────── */}
-          <SectionCard title="Project Scale & Investment" icon="📊">
-
-            <div>
-              <FieldLabel>Investment Amount (₹ INR)</FieldLabel>
-              <input
-                type="number"
-                min={0}
-                placeholder="e.g. 120000000"
-                value={profile.investment_inr ?? ''}
-                onChange={(e) => set('investment_inr', e.target.value ? Number(e.target.value) : undefined)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {profile.investment_inr ? (
-                <p className="mt-1 text-xs text-blue-600 font-medium">
-                  = ₹{Number(profile.investment_inr).toLocaleString('en-IN')}
-                  {profile.investment_inr >= 1e7 ? ` (₹${(profile.investment_inr / 1e7).toFixed(2)} Cr)` : ''}
-                </p>
-              ) : (
-                <FieldHint>Investment determines Large / Mega / Ultra-Mega classification and incentive tier.</FieldHint>
-              )}
-              <FieldError msg={errors.investment_inr} />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <FieldLabel>Expected Employment (persons)</FieldLabel>
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="e.g. 250"
-                  value={profile.employment_expected ?? ''}
-                  onChange={(e) => set('employment_expected', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <FieldError msg={errors.employment_expected} />
-              </div>
-              <div>
-                <FieldLabel>Power Requirement (kW, optional)</FieldLabel>
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="e.g. 2500"
-                  value={profile.power_kw ?? ''}
-                  onChange={(e) => set('power_kw', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <FieldError msg={errors.power_kw} />
-              </div>
-            </div>
-
-          </SectionCard>
-
-          {/* ── Section 5: Project Stage ──────────────────────────────────── */}
-          <SectionCard title="Project Stage" icon="🚦">
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {PROJECT_STAGES.map((stage) => (
-                <label
-                  key={stage}
-                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    profile.stage === stage
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-gray-200 hover:border-blue-300'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="stage"
-                    className="sr-only"
-                    checked={profile.stage === stage}
-                    onChange={() => set('stage', stage)}
-                  />
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 ${
-                        profile.stage === stage
-                          ? 'border-blue-600 bg-blue-600'
-                          : 'border-gray-300'
+                <FieldLabel required>Entity Constitution</FieldLabel>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {ENTITY_TYPES.map((t) => (
+                    <label
+                      key={t}
+                      className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition-colors ${
+                        profile.entity_type === t
+                          ? 'border-blue-600 bg-blue-50 text-blue-800 font-semibold'
+                          : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
                       }`}
-                    />
-                    <div>
-                      <p className="font-bold text-sm text-gray-900">{stage}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{STAGE_DESC[stage]}</p>
-                    </div>
-                  </div>
-                </label>
-              ))}
-            </div>
-            <FieldError msg={errors.stage} />
+                    >
+                      <input
+                        type="radio"
+                        name="entity_type"
+                        className="sr-only"
+                        checked={profile.entity_type === t}
+                        onChange={() => set('entity_type', t)}
+                      />
+                      <span>{t}</span>
+                    </label>
+                  ))}
+                </div>
+                <FieldError msg={errors.entity_type} />
+              </div>
 
-          </SectionCard>
-
-          {/* ── Assessment Summary ────────────────────────────────────────── */}
-          {profile.entity_name && profile.sector && profile.stage && (
-            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
-              <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">Assessment Preview</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { label: 'Entity', value: profile.entity_name },
-                  { label: 'Sector', value: profile.sector },
-                  { label: 'District', value: profile.district || '—' },
-                  { label: 'Stage', value: profile.stage },
-                  { label: 'Location', value: profile.location_type || '—' },
-                  { label: 'Investment', value: profile.investment_inr ? `₹${(profile.investment_inr / 1e7).toFixed(1)} Cr` : '—' },
-                  { label: 'Employment', value: profile.employment_expected ? `${profile.employment_expected} persons` : '—' },
-                  { label: 'Type', value: profile.entity_type || '—' },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <p className="text-xs text-blue-500 font-semibold uppercase tracking-wide">{item.label}</p>
-                    <p className="text-sm font-bold text-blue-900 truncate">{item.value}</p>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <FieldLabel required>Entity / Industrial Project Name</FieldLabel>
+                  <input
+                    type="text"
+                    placeholder="e.g. Maharashtra Textile Innovations Pvt. Ltd."
+                    value={profile.entity_name ?? ''}
+                    onChange={(e) => set('entity_name', e.target.value)}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  />
+                  <FieldError msg={errors.entity_name} />
+                </div>
+                <div>
+                  <FieldLabel>Enterprise PAN (Optional)</FieldLabel>
+                  <input
+                    type="text"
+                    maxLength={10}
+                    placeholder="e.g. AABCT1234E"
+                    value={profile.pan ?? ''}
+                    onChange={(e) => set('pan', e.target.value.toUpperCase())}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono uppercase bg-white"
+                  />
+                  <FieldError msg={errors.pan} />
+                </div>
               </div>
             </div>
-          )}
+          </div>
 
-          {/* Error banner */}
+          {/* Section 2: Industry Sector */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="bg-slate-50 border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+              <h2 className="font-bold text-slate-800 text-sm">2. Industry Sector & Activity</h2>
+              <span className="text-[11px] font-medium text-slate-400">Policy Matcher</span>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <FieldLabel required>Select Industry Sector</FieldLabel>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-1">
+                  {SECTORS.map((s) => (
+                    <label
+                      key={s}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs cursor-pointer transition-colors ${
+                        profile.sector === s
+                          ? 'border-blue-600 bg-blue-50 text-blue-800 font-semibold'
+                          : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="sector"
+                        className="sr-only"
+                        checked={profile.sector === s}
+                        onChange={() => set('sector', s)}
+                      />
+                      <span className="truncate">{s}</span>
+                    </label>
+                  ))}
+                </div>
+                <FieldError msg={errors.sector} />
+              </div>
+
+              <div>
+                <FieldLabel>Product / Manufacturing Activity Description</FieldLabel>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. Integrated textile spinning, weaving, powerloom knitting and apparel fabrication"
+                  value={profile.product_description ?? ''}
+                  onChange={(e) => set('product_description', e.target.value)}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white resize-none"
+                />
+                <FieldHint>Queried against official government policy gazettes for exact evidence extraction.</FieldHint>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Project Stage & Location */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="bg-slate-50 border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+              <h2 className="font-bold text-slate-800 text-sm">3. Project Stage & Location</h2>
+              <span className="text-[11px] font-medium text-slate-400">Clearance Sequencing</span>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <FieldLabel required>Project Lifecycle Stage</FieldLabel>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+                  {PROJECT_STAGES.map((stg) => (
+                    <label
+                      key={stg}
+                      className={`p-3 rounded-xl border text-xs cursor-pointer transition-colors ${
+                        profile.stage === stg
+                          ? 'border-blue-600 bg-blue-50 text-blue-900'
+                          : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="stage"
+                        className="sr-only"
+                        checked={profile.stage === stg}
+                        onChange={() => set('stage', stg)}
+                      />
+                      <div>
+                        <p className="font-bold text-slate-900 text-xs">{stg}</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">{STAGE_DESC[stg]}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+                <FieldError msg={errors.stage} />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <FieldLabel>District (Maharashtra)</FieldLabel>
+                  <select
+                    value={profile.district ?? ''}
+                    onChange={(e) => set('district', e.target.value)}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  >
+                    <option value="">-- Select District --</option>
+                    {DISTRICTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                  <FieldHint>Determines PSI-2019 Incentive Zone (Zone A, B, C, D, D+).</FieldHint>
+                </div>
+
+                <div>
+                  <FieldLabel>Location / Land Type</FieldLabel>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {LOCATION_TYPES.map((lt) => (
+                      <label
+                        key={lt}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs cursor-pointer transition-colors ${
+                          profile.location_type === lt
+                            ? 'border-blue-600 bg-blue-50 text-blue-800 font-semibold'
+                            : 'border-slate-200 text-slate-600 hover:border-slate-300 bg-white'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="location_type"
+                          className="sr-only"
+                          checked={profile.location_type === lt}
+                          onChange={() => set('location_type', lt)}
+                        />
+                        <span>{lt}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Progressive Scale Parameters */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="w-full bg-slate-50 hover:bg-slate-100 px-6 py-3 flex items-center justify-between text-left transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-800 text-sm">
+                  4. Investment Scale & Utility Parameters
+                </span>
+                <span className="text-xs text-slate-500 font-normal">
+                  ({showAdvanced ? 'Click to collapse' : 'Investment, Employment, Power'})
+                </span>
+              </div>
+              <span className="text-xs font-semibold text-blue-600">
+                {showAdvanced ? '▲ Less' : '▼ Expand'}
+              </span>
+            </button>
+
+            {showAdvanced && (
+              <div className="p-6 space-y-4 border-t border-slate-200">
+                <div>
+                  <FieldLabel>Proposed Capital Investment (₹ INR)</FieldLabel>
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="e.g. 120000000"
+                    value={profile.investment_inr ?? ''}
+                    onChange={(e) => set('investment_inr', e.target.value ? Number(e.target.value) : undefined)}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  />
+                  {profile.investment_inr ? (
+                    <p className="mt-1 text-xs text-slate-700 font-medium">
+                      = ₹{Number(profile.investment_inr).toLocaleString('en-IN')}
+                      {profile.investment_inr >= 1e7 ? ` (₹${(profile.investment_inr / 1e7).toFixed(2)} Crore)` : ''}
+                    </p>
+                  ) : null}
+                  <FieldError msg={errors.investment_inr} />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <FieldLabel>Expected Direct Employment (Persons)</FieldLabel>
+                    <input
+                      type="number"
+                      min={0}
+                      placeholder="e.g. 250"
+                      value={profile.employment_expected ?? ''}
+                      onChange={(e) => set('employment_expected', e.target.value ? Number(e.target.value) : undefined)}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    />
+                    <FieldError msg={errors.employment_expected} />
+                  </div>
+
+                  <div>
+                    <FieldLabel>Power Requirement (kW)</FieldLabel>
+                    <input
+                      type="number"
+                      min={0}
+                      placeholder="e.g. 2500"
+                      value={profile.power_kw ?? ''}
+                      onChange={(e) => set('power_kw', e.target.value ? Number(e.target.value) : undefined)}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    />
+                    <FieldError msg={errors.power_kw} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <FieldLabel>Taluka (Optional)</FieldLabel>
+                    <input
+                      type="text"
+                      placeholder="e.g. Haveli"
+                      value={profile.taluka ?? ''}
+                      onChange={(e) => set('taluka', e.target.value)}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <FieldLabel>Land Area (sq. metres / acres)</FieldLabel>
+                    <input
+                      type="number"
+                      min={0}
+                      placeholder="e.g. 10000"
+                      value={profile.land_area ?? ''}
+                      onChange={(e) => set('land_area', e.target.value ? Number(e.target.value) : undefined)}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Submit Error */}
           {submitError && (
-            <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
               <strong>Error:</strong> {submitError}
             </div>
           )}
 
-          {/* Submit */}
-          <div className="flex gap-4 items-center justify-end pt-2 pb-8">
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 pb-6">
             <button
+              type="button"
               onClick={resetForm}
-              className="px-5 py-3 rounded-xl border border-gray-300 text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+              className="w-full sm:w-auto px-4 py-2 rounded-xl border border-slate-300 text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
             >
-              Reset
+              Reset Form
             </button>
+
             <button
+              type="button"
               onClick={handleSubmit}
               disabled={loading}
-              className="px-10 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white font-bold text-base transition-colors shadow-lg shadow-orange-200 flex items-center gap-3"
+              className="w-full sm:w-auto px-8 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-semibold text-xs transition-colors shadow-xs flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>
-                  Assessing…
+                  <span>Evaluating Statutory Rules…</span>
                 </>
               ) : (
-                <>
-                  <span className="text-lg">🔍</span>
-                  Assess Project
-                </>
+                <span>Assess Project & Generate Report →</span>
               )}
             </button>
           </div>
 
         </div>
+
       </div>
-    </div>
+    </AppLayout>
   );
 }
 
 export default function AssessPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-gray-500 text-sm">Loading…</div>
-        </div>
-      }
-    >
+    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading Assessment Module…</div>}>
       <AssessInner />
     </Suspense>
   );

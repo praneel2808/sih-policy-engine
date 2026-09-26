@@ -2,154 +2,270 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import AppLayout from '@/components/AppLayout';
+import type { AssessmentResponse } from '@/types';
+import { getDbHealth } from '@/lib/api';
 
-interface User { username: string; name: string; role: string }
-
-export default function Home() {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [checked, setChecked] = useState(false);
+export default function DashboardHome() {
+  const [assessment, setAssessment] = useState<AssessmentResponse | null>(null);
+  const [isDemo, setIsDemo] = useState(false);
+  const [dbStats, setDbStats] = useState({
+    documents: 478,
+    canonical_rules: 1279,
+    form_requirements: 186,
+    chunks: 7426,
+  });
 
   useEffect(() => {
-    const raw = localStorage.getItem('smsws_user');
-    if (!raw) {
-      router.replace('/login');
-    } else {
-      try { setUser(JSON.parse(raw)); } catch { router.replace('/login'); }
+    const raw = localStorage.getItem('smsws_assessment');
+    const demo = localStorage.getItem('smsws_demo');
+    if (raw) {
+      try {
+        setAssessment(JSON.parse(raw));
+      } catch {
+        // ignore
+      }
     }
-    setChecked(true);
-  }, [router]);
+    setIsDemo(demo === '1');
 
-  function logout() {
-    localStorage.removeItem('smsws_user');
-    router.push('/login');
-  }
-
-  if (!checked || !user) return null;
+    getDbHealth()
+      .then((res) => {
+        if (res && res.documents) {
+          setDbStats({
+            documents: res.documents,
+            canonical_rules: res.canonical_rules,
+            form_requirements: res.form_requirements,
+            chunks: res.chunks,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-900 flex flex-col">
-
-      {/* Top nav */}
-      <header className="w-full border-b border-white/10 bg-white/5 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-orange-400/20 border border-orange-400/60 flex items-center justify-center">
-              <span className="text-orange-300 text-sm font-serif">&#x0950;</span>
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-orange-300 text-[10px] font-semibold tracking-widest uppercase">
-                Government of Maharashtra
-              </span>
-              <span className="text-white font-bold text-sm tracking-tight">
-                Udyog Sahayak &mdash; Single Window System
+    <AppLayout>
+      <div className="space-y-6">
+        
+        {/* Executive Hero Banner */}
+        <div className="bg-slate-900 rounded-2xl p-6 text-white border border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="space-y-1.5 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-semibold tracking-wider uppercase border border-slate-700">
+                Government of Maharashtra · MAITRI Portal
               </span>
             </div>
-          </div>
-          {/* User badge + logout */}
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex flex-col items-end leading-none">
-              <span className="text-white text-xs font-semibold">{user.name}</span>
-              <span className="text-blue-300 text-[10px]">{user.role}</span>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-orange-500/80 flex items-center justify-center text-white font-bold text-sm">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-            <button
-              onClick={logout}
-              className="text-blue-300 hover:text-white text-xs border border-blue-600 hover:border-blue-400 px-3 py-1.5 rounded-lg transition-colors"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-16 text-center">
-        <div className="max-w-3xl w-full">
-
-          <div className="mb-8 flex flex-col items-center gap-2">
-            <div className="w-20 h-20 rounded-full bg-orange-400/15 border-2 border-orange-400/50 flex items-center justify-center shadow-lg shadow-orange-900/30">
-              <span className="text-orange-300 text-4xl font-serif">&#x0950;</span>
-            </div>
-            <p className="text-orange-300/80 text-xs tracking-[0.3em] uppercase">Satyameva Jayate</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+              Unified Industrial Approval System
+            </h1>
+            <p className="text-slate-300 text-sm leading-relaxed">
+              Automated statutory clearance identification, department routing, and state incentive discovery for industrial enterprises across Maharashtra.
+            </p>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight mb-4">
-            <span className="text-blue-200">Smart Maharashtra</span>
-            <br />
-            Single Window System
-          </h1>
-
-          <p className="text-blue-200 text-lg leading-relaxed max-w-2xl mx-auto mb-3">
-            Instantly determine the approvals, incentives, required documents,
-            and government forms for your industrial project in Maharashtra.
-          </p>
-          <p className="text-blue-300/70 text-sm leading-relaxed max-w-xl mx-auto mb-12">
-            Powered by an AI-extracted knowledge base of{' '}
-            <strong className="text-blue-200">478 official government documents</strong>,{' '}
-            <strong className="text-blue-200">1,279 canonical policy rules</strong>, and{' '}
-            <strong className="text-blue-200">186 extracted form requirements</strong>.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+          {/* Action CTAs */}
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             <Link
               href="/assess?demo=textile"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-orange-500 hover:bg-orange-400 text-white font-bold rounded-xl shadow-xl shadow-orange-900/40 transition-all text-base"
+              className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs transition-colors shadow-xs"
             >
-              <span className="text-xl">⚡</span>
               Try Demo Project
             </Link>
             <Link
               href="/assess"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-blue-300/50 hover:bg-white/10 text-blue-100 font-semibold rounded-xl transition-all text-base"
+              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl text-xs border border-slate-700 transition-colors"
             >
-              <span className="text-lg">+</span>
-              New Assessment
+              + New Assessment
+            </Link>
+          </div>
+        </div>
+
+        {/* Demo Selection Quick-Bar */}
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <p className="font-semibold text-slate-900 text-xs">Demonstration Profiles Ready for Assessment</p>
+            <p className="text-slate-500 text-[11px] mt-0.5">Evaluate pre-configured enterprise projects across statutory rules and state policies:</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/assess?demo=textile"
+              className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-800 font-medium text-xs rounded-lg border border-slate-300 transition-colors"
+            >
+              Textile (Pune MIDC)
+            </Link>
+            <Link
+              href="/assess?demo=ev"
+              className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-800 font-medium text-xs rounded-lg border border-slate-300 transition-colors"
+            >
+              EV Manufacturing (Aurangabad)
+            </Link>
+          </div>
+        </div>
+
+        {/* Active Assessment Status */}
+        {assessment ? (
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                    Active Project Profile
+                  </span>
+                  {isDemo && (
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      Demo Data
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-lg font-bold text-slate-900 mt-1">
+                  {assessment.project_summary.entity_name}
+                </h2>
+                <p className="text-xs text-slate-500">
+                  {assessment.project_summary.sector} · {assessment.project_summary.stage} · District: {assessment.project_summary.district || 'All Maharashtra'}
+                </p>
+              </div>
+
+              <Link
+                href="/results"
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded-xl transition-colors self-start md:self-auto"
+              >
+                View Assessment Report →
+              </Link>
+            </div>
+
+            {/* Assessment Metrics */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
+              <div className="bg-slate-50 p-3 rounded-xl">
+                <span className="text-[10px] text-slate-500 font-semibold uppercase">Required Approvals</span>
+                <p className="text-lg font-bold text-slate-900 mt-0.5">
+                  {assessment.approvals.length} <span className="text-xs font-normal text-slate-500">clearances</span>
+                </p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-xl">
+                <span className="text-[10px] text-slate-500 font-semibold uppercase">State Incentives</span>
+                <p className="text-lg font-bold text-slate-900 mt-0.5">
+                  {assessment.incentives.length + assessment.applicable_policies.length} <span className="text-xs font-normal text-slate-500">schemes</span>
+                </p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-xl">
+                <span className="text-[10px] text-slate-500 font-semibold uppercase">Required Documents</span>
+                <p className="text-lg font-bold text-slate-900 mt-0.5">
+                  {assessment.documents_required.length} <span className="text-xs font-normal text-slate-500">files</span>
+                </p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-xl">
+                <span className="text-[10px] text-slate-500 font-semibold uppercase">Government Sources</span>
+                <p className="text-lg font-bold text-slate-900 mt-0.5">
+                  {assessment.sources.length} <span className="text-xs font-normal text-slate-500">citations</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 text-center py-8">
+            <h3 className="text-sm font-bold text-slate-900">No Assessment Profile Evaluated Yet</h3>
+            <p className="text-slate-500 text-xs max-w-md mx-auto mt-1 mb-4">
+              Enter your enterprise project details or load a verified demonstration profile to evaluate statutory clearances.
+            </p>
+            <div className="flex justify-center gap-3">
+              <Link
+                href="/assess?demo=textile"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl transition-colors"
+              >
+                Try Demo Assessment
+              </Link>
+              <Link
+                href="/assess"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium text-xs rounded-xl transition-colors"
+              >
+                Start New Project Profile
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Regulatory Knowledge Base Statistics */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+              Maharashtra Policy & Regulatory Knowledge Base
+            </h2>
+            <Link href="/knowledge" className="text-xs text-blue-600 hover:underline font-medium">
+              View Repository →
             </Link>
           </div>
 
-          {/* Stats strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
-            {[
-              { n: '478', label: 'Govt. Documents' },
-              { n: '1,279', label: 'Canonical Rules' },
-              { n: '186', label: 'Form Requirements' },
-              { n: '7,426', label: 'Source Chunks' },
-            ].map((s) => (
-              <div key={s.label} className="bg-white/8 border border-white/10 rounded-xl p-3 text-center">
-                <p className="text-white font-bold text-xl">{s.n}</p>
-                <p className="text-blue-300/80 text-xs mt-0.5">{s.label}</p>
-              </div>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <span className="text-[10px] font-bold text-slate-400 uppercase">Government Documents</span>
+              <p className="text-2xl font-bold text-slate-900 mt-1">{dbStats.documents}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Official GRs, Acts & Rules</p>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <span className="text-[10px] font-bold text-slate-400 uppercase">Canonical Rules</span>
+              <p className="text-2xl font-bold text-slate-900 mt-1">{dbStats.canonical_rules.toLocaleString()}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Deterministic rule logic</p>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <span className="text-[10px] font-bold text-slate-400 uppercase">Extracted Forms</span>
+              <p className="text-2xl font-bold text-slate-900 mt-1">{dbStats.form_requirements}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Prescribed statutory forms</p>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <span className="text-[10px] font-bold text-slate-400 uppercase">Evidence Chunks</span>
+              <p className="text-2xl font-bold text-slate-900 mt-1">{dbStats.chunks.toLocaleString()}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Direct page citations</p>
+            </div>
           </div>
         </div>
-      </main>
 
-      {/* Demo quick-links */}
-      <div className="border-t border-white/10 bg-white/5 py-4 px-6">
-        <div className="max-w-6xl mx-auto flex flex-wrap gap-4 items-center justify-center text-sm">
-          <span className="text-blue-400 font-medium">Demo profiles:</span>
-          <Link href="/assess?demo=textile" className="text-blue-200 hover:text-white underline underline-offset-2 transition-colors">
-            Textile (Pune, MIDC)
+        {/* Navigation Modules */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <Link href="/approvals" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs hover:border-slate-400 transition-colors group">
+            <h3 className="font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors">
+              Approvals & Statutory Clearances
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              MAITRI Single Window, MPCB Environmental Consent, DISH Factory Plan, and MIDC land permissions.
+            </p>
+            <div className="mt-3 text-xs font-semibold text-blue-600 flex items-center gap-1">
+              <span>View Clearance Catalogue</span>
+              <span>→</span>
+            </div>
           </Link>
-          <Link href="/assess?demo=ev" className="text-blue-200 hover:text-white underline underline-offset-2 transition-colors">
-            EV / Automotive (Aurangabad)
+
+          <Link href="/incentives" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs hover:border-slate-400 transition-colors group">
+            <h3 className="font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors">
+              Incentives & State Schemes
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Package Scheme of Incentives (PSI-2019), Textile Policy 2023-28, EV Policy 2021, and ESDM subsidies.
+            </p>
+            <div className="mt-3 text-xs font-semibold text-blue-600 flex items-center gap-1">
+              <span>Explore State Schemes</span>
+              <span>→</span>
+            </div>
           </Link>
+
+          <Link href="/forms" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs hover:border-slate-400 transition-colors group">
+            <h3 className="font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors">
+              Government Forms Repository
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Browse 186 extracted prescribed statutory forms, undertakings, affidavits, and submission modes.
+            </p>
+            <div className="mt-3 text-xs font-semibold text-blue-600 flex items-center gap-1">
+              <span>Browse 186 Forms</span>
+              <span>→</span>
+            </div>
+          </Link>
+
         </div>
-      </div>
 
-      {/* Footer */}
-      <footer className="py-4 px-6 text-center">
-        <p className="text-blue-400/60 text-xs max-w-2xl mx-auto leading-relaxed">
-          <strong className="text-blue-400/80">Disclaimer:</strong> This is a preliminary AI-assisted assessment tool.
-          All outputs are indicative only. Final approvals are subject to the relevant government departments
-          and statutory authorities of Maharashtra.
-        </p>
-      </footer>
-    </div>
+      </div>
+    </AppLayout>
   );
 }
