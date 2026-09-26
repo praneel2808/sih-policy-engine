@@ -10,17 +10,25 @@ data/output/*
 logs/*.log
 !logs/.gitkeep
 
-# Python cache, virtualenvs & logs
-__pycache__/
-*.py[cod]
-*$py.class
+# Python virtual environments & environment variables
 .venv/
+.venv*/
 venv/
-ENV/
+venv*/
 env/
+ENV/
+env.bak/
+venv.bak/
+.venv-win/
 .env
 .env.local
 .env.*.local
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
 
 # Node & Next.js frontend builds
 node_modules/
