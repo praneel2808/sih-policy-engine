@@ -1,0 +1,19 @@
+# PDF & OCR processing
+pymupdf>=1.23.0
+pytesseract>=0.3.10
+pdf2image>=1.16.3
+pillow>=10.0.0
+
+# Language Detection & NLP
+lingua-language-detector>=1.3.0
+langdetect>=1.0.9
+
+# Data validation, API & LLM
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.5.0
+google-genai>=0.1.0
+python-dotenv>=1.0.0
+
+# Testing & Utilities
+pytest>=7.4.0

@@ -1,0 +1,614 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'>
+<title>SMSWS Rule Normalization & Deduplication Report</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 30px; background: #f8fafc; color: #1e293b; }
+h1 { color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+h2 { color: #1e293b; margin-top: 30px; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin: 20px 0; }
+.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #3b82f6; }
+.card.ok { border-left-color: #10b981; }
+.card.warn { border-left-color: #f59e0b; }
+.card.danger { border-left-color: #ef4444; }
+.card .num { font-size: 28px; font-weight: bold; color: #0f172a; }
+.card .label { font-size: 14px; color: #64748b; margin-top: 5px; }
+table { width: 100%; border-collapse: collapse; margin: 15px 0; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+th { background: #f1f5f9; font-weight: 600; color: #475569; }
+tr:hover { background: #f8fafc; }
+.badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+.badge-active { background: #dcfce7; color: #166534; }
+.badge-duplicate { background: #fef3c7; color: #92400e; }
+.badge-conflict { background: #fee2e2; color: #991b1b; }
+.badge-uncertain { background: #e0e7ff; color: #3730a3; }
+.group-card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+</style></head><body>
+<h1>SMSWS Rule Normalization & Deduplication Report</h1>
+<p>Smart Maharashtra Single Window System &mdash; Policy Engine Candidate Rule Cleaning Layer</p>
+<div class='card-grid'>
+<div class='card'><div class='num'>1314</div><div class='label'>Candidate Rules Before</div></div>
+<div class='card ok'><div class='num'>1279</div><div class='label'>Canonical Rules After</div></div>
+<div class='card ok'><div class='num'>28</div><div class='label'>Multi-Source Clusters</div></div>
+<div class='card'><div class='num'>35</div><div class='label'>Total Duplicate Relations</div></div>
+<div class='card danger'><div class='num'>52</div><div class='label'>Possible Conflicts Preserved</div></div>
+<div class='card warn'><div class='num'>34</div><div class='label'>Uncertain Groups</div></div>
+</div>
+<h2>1. Duplicate Groups (Multi-Source Provenance)</h2>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0058</span> Maharashtra Logistics Policy 2024 Eligibility</h3>
+<p><strong>Sector:</strong> Logistics | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[SAME_RULE_DIFFERENT_SOURCE - conf: 1.00] Identical normalized rule requirements, criteria, and incentives across different documents (6e80e66a and 004514f1).</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#58</td><td><span class='badge badge-active'>Primary</span></td><td>025a_Maharashtra Logistics Policy 2024 - GR.pdf</td><td>Page 82-82</td><td><code>4793fcff7e90...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1172</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>500_doc-20250708-wa0003-english_0.pdf</td><td>Page 6-6</td><td><code>2601bc744a9d...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0060</span> Classification of Large Logistics Park</h3>
+<p><strong>Sector:</strong> Logistics | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.85] Highly similar rule name ('Classification of Large Logistics Park') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#60</td><td><span class='badge badge-active'>Primary</span></td><td>025a_Maharashtra Logistics Policy 2024 - GR.pdf</td><td>Page 105-105</td><td><code>61bb461a7841...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1174</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>500_doc-20250708-wa0003-english_0.pdf</td><td>Page 29-29</td><td><code>7d8e3a3fe2eb...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0061</span> Classification of Mega Logistics Park</h3>
+<p><strong>Sector:</strong> Logistics | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.85] Highly similar rule name ('Classification of Mega Logistics Park') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#61</td><td><span class='badge badge-active'>Primary</span></td><td>025a_Maharashtra Logistics Policy 2024 - GR.pdf</td><td>Page 105-105</td><td><code>61bb461a7841...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1175</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>500_doc-20250708-wa0003-english_0.pdf</td><td>Page 29-29</td><td><code>7d8e3a3fe2eb...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0062</span> Classification of Ultra Mega Logistics Park</h3>
+<p><strong>Sector:</strong> Logistics | <strong>Sources:</strong> 3 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.85] Highly similar rule name ('Classification of Ultra Mega Logistics Park') and identical benefit parameters with minor condition phrasing variations.; [NEAR_DUPLICATE - conf: 0.85] Highly similar rule name ('Ultra Mega Logistics Park') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#62</td><td><span class='badge badge-active'>Primary</span></td><td>025a_Maharashtra Logistics Policy 2024 - GR.pdf</td><td>Page 105-105</td><td><code>61bb461a7841...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#462</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>093_Maharashtra-Logistics-Policy-2024.pdf</td><td>Page 33-33</td><td><code>232229381298...</code></td><td><a href='https://midc.maharashtra.gov.in/en/investors/industrial-policies-and-incentives/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1176</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>500_doc-20250708-wa0003-english_0.pdf</td><td>Page 29-29</td><td><code>7d8e3a3fe2eb...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0063</span> Classification of Multi-Storeyed Logistics Park</h3>
+<p><strong>Sector:</strong> Logistics | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.85] Highly similar rule name ('Classification of Multi-Storeyed Logistics Park') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#63</td><td><span class='badge badge-active'>Primary</span></td><td>025a_Maharashtra Logistics Policy 2024 - GR.pdf</td><td>Page 106-106</td><td><code>c851513d68a5...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1177</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>500_doc-20250708-wa0003-english_0.pdf</td><td>Page 30-30</td><td><code>6d0e5e8651ad...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0067</span> Integrated Truck Terminals</h3>
+<p><strong>Sector:</strong> Logistics | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('Integrated Truck Terminals') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#67</td><td><span class='badge badge-active'>Primary</span></td><td>025a_Maharashtra Logistics Policy 2024 - GR.pdf</td><td>Page 107-107</td><td><code>be1d1b3e5e70...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#467</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>093_Maharashtra-Logistics-Policy-2024.pdf</td><td>Page 35-35</td><td><code>364bfdbc723e...</code></td><td><a href='https://midc.maharashtra.gov.in/en/investors/industrial-policies-and-incentives/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0070</span> Eligibility criteria for Green Logistics Park</h3>
+<p><strong>Sector:</strong> Logistics | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[SAME_RULE_DIFFERENT_SOURCE - conf: 1.00] Identical normalized rule requirements, criteria, and incentives across different documents (6e80e66a and 458eaed3).</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#70</td><td><span class='badge badge-active'>Primary</span></td><td>025a_Maharashtra Logistics Policy 2024 - GR.pdf</td><td>Page 124-124</td><td><code>3420cd98006b...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#471</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>093_Maharashtra-Logistics-Policy-2024.pdf</td><td>Page 54-54</td><td><code>124224fd750e...</code></td><td><a href='https://midc.maharashtra.gov.in/en/investors/industrial-policies-and-incentives/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0075</span> Special Capital Incentives for Integrated Truck Terminals</h3>
+<p><strong>Sector:</strong> Logistics | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('Special Capital Incentives for Integrated Truck Terminals') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#75</td><td><span class='badge badge-active'>Primary</span></td><td>025a_Maharashtra Logistics Policy 2024 - GR.pdf</td><td>Page 125-125</td><td><code>e406ab47443a...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1189</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>500_doc-20250708-wa0003-english_0.pdf</td><td>Page 49-49</td><td><code>8eb692ed081a...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0095</span> Mega EV Enterprise - Areas A and B</h3>
+<p><strong>Sector:</strong> Electric Vehicle | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('Mega EV Enterprise - Areas A and B') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#95</td><td><span class='badge badge-active'>Primary</span></td><td>047_Electric_Vehicle.pdf</td><td>Page 5-5</td><td><code>6fdfaebc0095...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#99</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>047_Electric_Vehicle.pdf</td><td>Page 15-15</td><td><code>38f7bbd0d03e...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0096</span> Mega EV Enterprise - Areas C, D and D+</h3>
+<p><strong>Sector:</strong> Electric Vehicle | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('Mega EV Enterprise - Areas C, D and D+') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#96</td><td><span class='badge badge-active'>Primary</span></td><td>047_Electric_Vehicle.pdf</td><td>Page 5-5</td><td><code>6fdfaebc0095...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#100</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>047_Electric_Vehicle.pdf</td><td>Page 15-15</td><td><code>38f7bbd0d03e...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0097</span> Ultra Mega EV Enterprises</h3>
+<p><strong>Sector:</strong> Electric Vehicle | <strong>Sources:</strong> 3 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[EXACT_DUPLICATE - conf: 1.00] Identical normalized rule requirements, criteria, and incentives in same document (1220390f).; [NEAR_DUPLICATE - conf: 0.85] Highly similar rule name ('Ultra Mega EV Enterprises') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#97</td><td><span class='badge badge-active'>Primary</span></td><td>047_Electric_Vehicle.pdf</td><td>Page 5-5</td><td><code>6fdfaebc0095...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#101</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>047_Electric_Vehicle.pdf</td><td>Page 15-15</td><td><code>38f7bbd0d03e...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#105</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>047_Electric_Vehicle.pdf</td><td>Page 23-23</td><td><code>21f804c97a89...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0098</span> Large EV Enterprises</h3>
+<p><strong>Sector:</strong> Electric Vehicle | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[EXACT_DUPLICATE - conf: 1.00] Identical normalized rule requirements, criteria, and incentives in same document (1220390f).</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#98</td><td><span class='badge badge-active'>Primary</span></td><td>047_Electric_Vehicle.pdf</td><td>Page 5-5</td><td><code>6fdfaebc0095...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#102</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>047_Electric_Vehicle.pdf</td><td>Page 15-15</td><td><code>38f7bbd0d03e...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0118</span> Maharashtra Industrial Policy 2019 Validity Period</h3>
+<p><strong>Sector:</strong> General Industry | <strong>Sources:</strong> 4 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.85] Highly similar rule name ('Maharashtra Industrial Policy 2019 Validity Period') and identical benefit parameters with minor condition phrasing variations.; [NEAR_DUPLICATE - conf: 0.90] Highly similar rule name ('Maharashtra Industrial Policy 2019 Validity Period') and identical benefit parameters with minor condition phrasing variations.; [NEAR_DUPLICATE - conf: 0.85] Highly similar rule name ('Maharashtra Industrial Policy 2019 Validity Period') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#123</td><td><span class='badge badge-active'>Primary</span></td><td>018b_Maharashtra New Industrial Policy-2019.pdf</td><td>Page 59-59</td><td><code>2f2f6917c2c5...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#415</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>056f_Industrial Policy - 2019.pdf</td><td>Page 7-7</td><td><code>c47d1d2073d9...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#960</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>100_Maharashtra-Industrial-Policy-2019.pdf</td><td>Page 4-4</td><td><code>eba1323014e5...</code></td><td><a href='https://midc.maharashtra.gov.in/en/investors/industrial-policies-and-incentives/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1268</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>507_maharashtra-new-industrial-policy-2019-english.pdf</td><td>Page 4-4</td><td><code>7e8ec11329b7...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0129</span> Export Infrastructure Support - Testing and Quality Certification Laboratories</h3>
+<p><strong>Sector:</strong> Export Promotion | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.97] Highly similar rule name ('Export Infrastructure Support - Testing and Quality Certification Laboratories') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#134</td><td><span class='badge badge-active'>Primary</span></td><td>018b_Maharashtra New Industrial Policy-2019.pdf</td><td>Page 76-76</td><td><code>e775f340d1d4...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#429</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>056f_Industrial Policy - 2019.pdf</td><td>Page 23-23</td><td><code>add09d8afbd9...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0179</span> MSME Capital Subsidy</h3>
+<p><strong>Sector:</strong> AVGC-XR | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('MSME Capital Subsidy') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#184</td><td><span class='badge badge-active'>Primary</span></td><td>108_AVGCXR Policy GR 03112025.pdf</td><td>Page 55-55</td><td><code>581d583cb1dd...</code></td><td><a href='https://maitri.maharashtra.gov.in/wp-content/themes/maitri/PDF/AVGCXR%20Policy%20GR%2003112025.pdf' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1291</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>506_maharashtra-animation-visual-effects-gaming-comics-and-extended-reality-2_1.pdf</td><td>Page 55-55</td><td><code>7a43509ba9b0...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0181</span> Exemption of Electricity Duty</h3>
+<p><strong>Sector:</strong> AVGC-XR | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('Exemption of Electricity Duty') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#186</td><td><span class='badge badge-active'>Primary</span></td><td>108_AVGCXR Policy GR 03112025.pdf</td><td>Page 56-56</td><td><code>0f9db9aa43e9...</code></td><td><a href='https://maitri.maharashtra.gov.in/wp-content/themes/maitri/PDF/AVGCXR%20Policy%20GR%2003112025.pdf' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1293</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>506_maharashtra-animation-visual-effects-gaming-comics-and-extended-reality-2_1.pdf</td><td>Page 56-56</td><td><code>3fb7ecc0f6a2...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0183</span> Recruitment Assistance</h3>
+<p><strong>Sector:</strong> AVGC-XR | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('Recruitment Assistance') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#188</td><td><span class='badge badge-active'>Primary</span></td><td>108_AVGCXR Policy GR 03112025.pdf</td><td>Page 57-57</td><td><code>338974feb46b...</code></td><td><a href='https://maitri.maharashtra.gov.in/wp-content/themes/maitri/PDF/AVGCXR%20Policy%20GR%2003112025.pdf' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1296</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>506_maharashtra-animation-visual-effects-gaming-comics-and-extended-reality-2_1.pdf</td><td>Page 57-57</td><td><code>6fd8117c17b6...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0421</span> Large Scale Industries Electricity Duty Exemption</h3>
+<p><strong>Sector:</strong> Large Scale Industries | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('Large Scale Industries Electricity Duty Exemption') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#427</td><td><span class='badge badge-active'>Primary</span></td><td>056f_Industrial Policy - 2019.pdf</td><td>Page 17-17</td><td><code>cf11dc1d6ee5...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/policies/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1279</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>507_maharashtra-new-industrial-policy-2019-english.pdf</td><td>Page 14-14</td><td><code>70050aba60ee...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0556</span> Low Risk Category Building Permission</h3>
+<p><strong>Sector:</strong> Real Estate / Construction | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.89] Highly similar rule name ('Low Risk Category Building Permission') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#566</td><td><span class='badge badge-active'>Primary</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 396-396</td><td><code>9383ff06c346...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#567</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 396-396</td><td><code>9383ff06c346...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0640</span> Additional FSI for Pharma Industry</h3>
+<p><strong>Sector:</strong> Pharmaceuticals | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('Additional FSI for Pharma Industry') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#651</td><td><span class='badge badge-active'>Primary</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 896-896</td><td><code>18015a3d34c1...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#701</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 1695-1696</td><td><code>4c024d902a99...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0653</span> Regulations for Development of Information Technology Establishment</h3>
+<p><strong>Sector:</strong> Information Technology | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 1.00] Highly similar rule name ('Regulations for Development of Information Technology Establishment') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#664</td><td><span class='badge badge-active'>Primary</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 1117-1117</td><td><code>1b938c6d5245...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#758</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 3346-3346</td><td><code>f055d2d8e7ee...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0705</span> Purely Residential Zone (R1) Regulations</h3>
+<p><strong>Sector:</strong> Real Estate and Urban Development | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.88] Highly similar rule name ('Purely Residential Zone (R1) Regulations') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#717</td><td><span class='badge badge-active'>Primary</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 2702-2702</td><td><code>03eade4d0f35...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#718</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 2705-2705</td><td><code>3ad0fce75608...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0708</span> Public-Semi Public Zone Regulations</h3>
+<p><strong>Sector:</strong> Real Estate / Urban Development | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.86] Highly similar rule name ('Public-Semi Public Zone Regulations') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#721</td><td><span class='badge badge-active'>Primary</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 2709-2709</td><td><code>1ec30fbd27e2...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+<tr><td>#723</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>062_Comprehensive Uniform Building Bye Law.pdf</td><td>Page 2711-2711</td><td><code>7acf579eaf04...</code></td><td><a href='https://maitri.maharashtra.gov.in/resources/acts-and-rules/' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0863</span> Bank Guarantee for Health Care Establishments - Consent to Establish</h3>
+<p><strong>Sector:</strong> Healthcare / Pollution Control | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.91] Highly similar rule name ('Bank Guarantee for Health Care Establishments - Consent to Establish') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#878</td><td><span class='badge badge-active'>Primary</span></td><td>173_Circular_20250624_18103224_rotated.pdf</td><td>Page 1-1</td><td><code>f9b4bc1c7907...</code></td><td><a href='https://www.mpcb.gov.in/en/circulars-types/all' target='_blank'>Official Link</a></td></tr>
+<tr><td>#879</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>173_Circular_20250624_18103224_rotated.pdf</td><td>Page 2-2</td><td><code>e3d96aaeedda...</code></td><td><a href='https://www.mpcb.gov.in/en/circulars-types/all' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0864</span> EPR Registration Fee for Producers (> 1,00,000 MT)</h3>
+<p><strong>Sector:</strong> Used Oil Management | <strong>Sources:</strong> 5 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.92] Highly similar rule name ('EPR Registration Fee for Producers (> 1,00,000 MT)') and identical benefit parameters with minor condition phrasing variations.; [NEAR_DUPLICATE - conf: 0.94] Highly similar rule name ('EPR Registration Fee for Producers (> 1,00,000 MT)') and identical benefit parameters with minor condition phrasing variations.; [NEAR_DUPLICATE - conf: 0.90] Highly similar rule name ('EPR Registration Fee for Producers (> 1,00,000 MT)') and identical benefit parameters with minor condition phrasing variations.; [NEAR_DUPLICATE - conf: 0.92] Highly similar rule name ('EPR Registration Fee for Producers (> 1,00,000 MT)') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#880</td><td><span class='badge badge-active'>Primary</span></td><td>332_Used_Oil_SoP_Producer_Registration_2024.pdf</td><td>Page 15-17</td><td><code>a616af2cb306...</code></td><td><a href='https://www.mpcb.gov.in/en/circulars-types/all' target='_blank'>Official Link</a></td></tr>
+<tr><td>#881</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>332_Used_Oil_SoP_Producer_Registration_2024.pdf</td><td>Page 15-17</td><td><code>a616af2cb306...</code></td><td><a href='https://www.mpcb.gov.in/en/circulars-types/all' target='_blank'>Official Link</a></td></tr>
+<tr><td>#882</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>332_Used_Oil_SoP_Producer_Registration_2024.pdf</td><td>Page 15-17</td><td><code>a616af2cb306...</code></td><td><a href='https://www.mpcb.gov.in/en/circulars-types/all' target='_blank'>Official Link</a></td></tr>
+<tr><td>#883</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>332_Used_Oil_SoP_Producer_Registration_2024.pdf</td><td>Page 15-17</td><td><code>a616af2cb306...</code></td><td><a href='https://www.mpcb.gov.in/en/circulars-types/all' target='_blank'>Official Link</a></td></tr>
+<tr><td>#884</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>332_Used_Oil_SoP_Producer_Registration_2024.pdf</td><td>Page 15-17</td><td><code>a616af2cb306...</code></td><td><a href='https://www.mpcb.gov.in/en/circulars-types/all' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-0979</span> Fly Ash Utilization Targets for Existing Thermal Power Stations</h3>
+<p><strong>Sector:</strong> Environment / Energy | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.93] Highly similar rule name ('Fly Ash Utilization Targets for Existing Thermal Power Stations') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#1000</td><td><span class='badge badge-active'>Primary</span></td><td>245_Flyash.pdf</td><td>Page 3-3</td><td><code>111531028309...</code></td><td><a href='https://www.mpcb.gov.in/en/circulars-types/all' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1001</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>245_Flyash.pdf</td><td>Page 4-4</td><td><code>e711b718c593...</code></td><td><a href='https://www.mpcb.gov.in/en/circulars-types/all' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-1096</span> Time-limit for review of lay-off order</h3>
+<p><strong>Sector:</strong> Labour | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.87] Highly similar rule name ('Time-limit for review of lay-off order') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#1118</td><td><span class='badge badge-active'>Primary</span></td><td>464_code-on-ir-draft-rules-2026_0.pdf</td><td>Page 150-151</td><td><code>2efb4c40d775...</code></td><td><a href='https://labour.maharashtra.gov.in/en/publication/new-labour-code' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1121</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>464_code-on-ir-draft-rules-2026_0.pdf</td><td>Page 152-153</td><td><code>24ef8af99129...</code></td><td><a href='https://labour.maharashtra.gov.in/en/publication/new-labour-code' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<div class='group-card'>
+<h3><span class='badge badge-active'>CANON-1268</span> Financial Assistance to Innovation Labs (Animation Films)</h3>
+<p><strong>Sector:</strong> AVGC-XR | <strong>Sources:</strong> 2 | <strong>Confidence:</strong> 0.95</p>
+<p style='color: #475569; font-size: 13px;'><em>[NEAR_DUPLICATE - conf: 0.94] Highly similar rule name ('Financial Assistance to Innovation Labs (Animation Films)') and identical benefit parameters with minor condition phrasing variations.</em></p>
+<table><thead><tr><th>Rule ID</th><th>Status</th><th>Document</th><th>Pages</th><th>Chunk ID</th><th>Official Source</th></tr></thead><tbody>
+<tr><td>#1302</td><td><span class='badge badge-active'>Primary</span></td><td>506_maharashtra-animation-visual-effects-gaming-comics-and-extended-reality-2_1.pdf</td><td>Page 59-59</td><td><code>050bd2fcae76...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+<tr><td>#1303</td><td><span class='badge badge-duplicate'>Duplicate</span></td><td>506_maharashtra-animation-visual-effects-gaming-comics-and-extended-reality-2_1.pdf</td><td>Page 59-59</td><td><code>050bd2fcae76...</code></td><td><a href='https://industry.maharashtra.gov.in/index.php/en/services/policies' target='_blank'>Official Link</a></td></tr>
+</tbody></table></div>
+<h2>2. Conflicting & Ambiguous Rule Pairs</h2>
+<table><thead><tr><th>Rel ID</th><th>Type</th><th>Rule A</th><th>Rule B</th><th>Reason</th></tr></thead><tbody>
+<tr><td>#686</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#4</strong> Stamp Duty Exemption for IT, ITeS, AVGC, Data Centre & Emerging Technology Units<br><small style='color:#64748b;'>505_it-policy-2023.pdf</small></td>
+<td><strong>#773</strong> Stamp Duty Exemption for IT/ITES Units<br><small style='color:#64748b;'>050_Information Technology Policy (IT_ITES_Policy_2015_final_English).pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'stamp duty exemption': 50.0% vs 100.0%.</td></tr>
+<tr><td>#691</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#8</strong> Market Development Assistance for IT MSMEs and Startups<br><small style='color:#64748b;'>505_it-policy-2023.pdf</small></td>
+<td><strong>#20</strong> M-Hub Market Development Assistance<br><small style='color:#64748b;'>505_it-policy-2023.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'market development assistance': INR 300,000 vs INR 2,500,000.</td></tr>
+<tr><td>#704</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#769</strong> Additional FSI for IT and AVGC Parks (Upto 100%)<br><small style='color:#64748b;'>050_Information Technology Policy (IT_ITES_Policy_2015_final_English).pdf</small></td>
+<td><strong>#770</strong> Additional FSI for IT and AVGC Parks (Above 100% and upto 200%)<br><small style='color:#64748b;'>050_Information Technology Policy (IT_ITES_Policy_2015_final_English).pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'additional fsi': 100.0% vs 200.0%.</td></tr>
+<tr><td>#917</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#75</strong> Special Capital Incentives for Integrated Truck Terminals<br><small style='color:#64748b;'>025a_Maharashtra Logistics Policy 2024 - GR.pdf</small></td>
+<td><strong>#472</strong> Special Capital Incentives for Logistics Parks<br><small style='color:#64748b;'>093_Maharashtra-Logistics-Policy-2024.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'capital subsidy': INR 10,000,000 vs INR 400,000,000.</td></tr>
+<tr><td>#923</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#77</strong> Interest Subsidy for Standalone Logistics Units inside Parks<br><small style='color:#64748b;'>025a_Maharashtra Logistics Policy 2024 - GR.pdf</small></td>
+<td><strong>#78</strong> Interest Subsidy for Standalone Logistics Units outside Parks<br><small style='color:#64748b;'>025a_Maharashtra Logistics Policy 2024 - GR.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'interest subsidy': 3.0% vs 2.0%.</td></tr>
+<tr><td>#924</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#77</strong> Interest Subsidy for Standalone Logistics Units inside Parks<br><small style='color:#64748b;'>025a_Maharashtra Logistics Policy 2024 - GR.pdf</small></td>
+<td><strong>#473</strong> Interest Subsidy and Stamp Duty Exemption for Standalone Logistics Units<br><small style='color:#64748b;'>093_Maharashtra-Logistics-Policy-2024.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'interest subsidy': 3.0% vs 2.0%.</td></tr>
+<tr><td>#1026</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#472</strong> Special Capital Incentives for Logistics Parks<br><small style='color:#64748b;'>093_Maharashtra-Logistics-Policy-2024.pdf</small></td>
+<td><strong>#1189</strong> Special Capital Incentives for Integrated Truck Terminals<br><small style='color:#64748b;'>500_doc-20250708-wa0003-english_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'capital subsidy': INR 400,000,000 vs INR 10,000,000.</td></tr>
+<tr><td>#1162</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#271</strong> Solar Power Plant Capital Subsidy for Existing Textile Units<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td><strong>#921</strong> IPDS Scheme Capital Subsidy for Processing Projects<br><small style='color:#64748b;'>103_Textile-Policy-2018-2023.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'capital subsidy': INR 48,000,000 vs INR 375,000,000.</td></tr>
+<tr><td>#1166</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#274</strong> Solar Power Plant Guidelines and Electricity Subsidy Capping for Textile Units<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td><strong>#276</strong> Cooperative Powerlooms Electricity Subsidy and Maha-TUFS CIS Rates<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'capital subsidy': INR 48,000,000 vs INR 96,000,000.</td></tr>
+<tr><td>#1167</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#275</strong> Maha Technology Upgradation Fund Scheme (Maha-TUFS) for Spinning Units & Cooperative Powerlooms Share Capital<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td><strong>#279</strong> Maha Technology Upgradation Fund Scheme (MAHA-TUFS)<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital investment subsidy (cis)': 40.0% vs 25.0%.</td></tr>
+<tr><td>#1169</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#276</strong> Cooperative Powerlooms Electricity Subsidy and Maha-TUFS CIS Rates<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td><strong>#278</strong> Private Powerlooms Solar Power Plant and Electricity Subsidy Guidelines<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'capital subsidy': INR 96,000,000 vs INR 48,000,000.</td></tr>
+<tr><td>#1174</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#282</strong> Processing Sector Capital and Electricity Subsidy<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td><strong>#289</strong> Non-Conventional Yarn/Fiber and Synthetic Yarn/Fiber Capital and Electricity Subsidy<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 30.0% vs 25.0%.</td></tr>
+<tr><td>#1175</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#284</strong> Support for Effluent Treatment Plants (ETP) and Common Effluent Treatment Plant (CETP)<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td><strong>#293</strong> Support for Setting up common Steam Generation Plant<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'capital subsidy': INR 50,000,000 vs INR 10,000,000.</td></tr>
+<tr><td>#1176</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#285</strong> Support for Zero Liquid Discharge (ZLD)<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td><strong>#291</strong> Support for Effluent Treatment Plants (ETP) and Zero Liquid Discharge (ZLD)<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'capital subsidy': INR 100,000,000 vs INR 50,000,000.</td></tr>
+<tr><td>#1177</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#297</strong> Technical Textile Parks Eligibility and Incentives<br><small style='color:#64748b;'>097_Integrated-and-Sustainable-Textile-Policy-2023.pdf</small></td>
+<td><strong>#484</strong> Scheme for Integrated Textile Parks (SITP) Financial Assistance<br><small style='color:#64748b;'>040_New_Maharashtra_Textile_Policy-2011-17.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 55.0% vs 9.0%.</td></tr>
+<tr><td>#1180</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#480</strong> 10% Capital Subsidy for New Textile Units in Vidarbha, Marathwada and North Maharashtra<br><small style='color:#64748b;'>040_New_Maharashtra_Textile_Policy-2011-17.pdf</small></td>
+<td><strong>#495</strong> General Capital Subsidy Scheme for Textile Units<br><small style='color:#64748b;'>056m_Textile Policy - 2018.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 10.0% vs 5.0%.</td></tr>
+<tr><td>#1181</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#482</strong> 10% Capital Subsidy for Textile Units<br><small style='color:#64748b;'>040_New_Maharashtra_Textile_Policy-2011-17.pdf</small></td>
+<td><strong>#495</strong> General Capital Subsidy Scheme for Textile Units<br><small style='color:#64748b;'>056m_Textile Policy - 2018.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 10.0% vs 5.0%.</td></tr>
+<tr><td>#1182</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#482</strong> 10% Capital Subsidy for Textile Units<br><small style='color:#64748b;'>040_New_Maharashtra_Textile_Policy-2011-17.pdf</small></td>
+<td><strong>#920</strong> Capital Subsidy in lieu of Interest Subsidy<br><small style='color:#64748b;'>103_Textile-Policy-2018-2023.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 10.0% vs 40.0%.</td></tr>
+<tr><td>#1183</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#482</strong> 10% Capital Subsidy for Textile Units<br><small style='color:#64748b;'>040_New_Maharashtra_Textile_Policy-2011-17.pdf</small></td>
+<td><strong>#921</strong> IPDS Scheme Capital Subsidy for Processing Projects<br><small style='color:#64748b;'>103_Textile-Policy-2018-2023.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 10.0% vs 25.0%.</td></tr>
+<tr><td>#1184</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#487</strong> Capital Subsidy Scheme under State Textile Policy for Cotton Growing Talukas<br><small style='color:#64748b;'>040_New_Maharashtra_Textile_Policy-2011-17.pdf</small></td>
+<td><strong>#495</strong> General Capital Subsidy Scheme for Textile Units<br><small style='color:#64748b;'>056m_Textile Policy - 2018.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 10.0% vs 5.0%.</td></tr>
+<tr><td>#1188</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#495</strong> General Capital Subsidy Scheme for Textile Units<br><small style='color:#64748b;'>056m_Textile Policy - 2018.pdf</small></td>
+<td><strong>#920</strong> Capital Subsidy in lieu of Interest Subsidy<br><small style='color:#64748b;'>103_Textile-Policy-2018-2023.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 5.0% vs 40.0%.</td></tr>
+<tr><td>#1189</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#495</strong> General Capital Subsidy Scheme for Textile Units<br><small style='color:#64748b;'>056m_Textile Policy - 2018.pdf</small></td>
+<td><strong>#921</strong> IPDS Scheme Capital Subsidy for Processing Projects<br><small style='color:#64748b;'>103_Textile-Policy-2018-2023.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 5.0% vs 25.0%.</td></tr>
+<tr><td>#1190</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#805</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Technical Textile Parks<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td><strong>#806</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Maha-TUFS Scheme<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 55.0% vs 40.0%.</td></tr>
+<tr><td>#1191</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#805</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Technical Textile Parks<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td><strong>#807</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Mini Textile Complexes<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 55.0% vs 40.0%.</td></tr>
+<tr><td>#1192</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#805</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Technical Textile Parks<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td><strong>#808</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Solar and ETP Subsidies<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 55.0% vs 20.0%.</td></tr>
+<tr><td>#1193</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#806</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Maha-TUFS Scheme<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td><strong>#807</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Mini Textile Complexes<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'capital subsidy': INR 250,000,000 vs INR 300,000,000.</td></tr>
+<tr><td>#1194</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#806</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Maha-TUFS Scheme<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td><strong>#808</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Solar and ETP Subsidies<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 40.0% vs 20.0%.</td></tr>
+<tr><td>#1195</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#807</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Mini Textile Complexes<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td><strong>#808</strong> Maharashtra Integrated & Sustainable Textile Policy 2023 - Solar and ETP Subsidies<br><small style='color:#64748b;'>495_202512311332497910.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 40.0% vs 20.0%.</td></tr>
+<tr><td>#1266</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1234</strong> Maharashtra Bamboo Industry Policy 2025 - Capital Subsidy<br><small style='color:#64748b;'>498_bamboo-policy-2025_0.pdf</small></td>
+<td><strong>#1240</strong> Maharashtra Bamboo Industry Policy 2025 - Subsidy for Tissue Culture Labs and R&D Units<br><small style='color:#64748b;'>498_bamboo-policy-2025_0.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 20.0% vs 50.0%.</td></tr>
+<tr><td>#1280</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1239</strong> Maharashtra Bamboo Industry Policy 2025 - Technology Adoption Support<br><small style='color:#64748b;'>498_bamboo-policy-2025_0.pdf</small></td>
+<td><strong>#1240</strong> Maharashtra Bamboo Industry Policy 2025 - Subsidy for Tissue Culture Labs and R&D Units<br><small style='color:#64748b;'>498_bamboo-policy-2025_0.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'capital subsidy': 25.0% vs 50.0%.</td></tr>
+<tr><td>#1294</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#513</strong> Higher FSI for Educational Buildings<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td><strong>#514</strong> Higher FSI for Other Educational Buildings and Hostels<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'premium fsi': 5.0% vs 10.0%.</td></tr>
+<tr><td>#1301</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#850</strong> Export Promotion Policy Package of Incentives for MSMEs Outside EOIP<br><small style='color:#64748b;'>096_Maharashtra-State-Export-Promotion-Policy-2023.pdf</small></td>
+<td><strong>#852</strong> Export Promotion Policy Package of Incentives for MSMEs within EOIP<br><small style='color:#64748b;'>096_Maharashtra-State-Export-Promotion-Policy-2023.pdf</small></td>
+<td>Conflicting reimbursement percentages for incentive 'special export incentive': 1.0% vs 2.0%.</td></tr>
+<tr><td>#1302</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#857</strong> Special Export Promotion Package for Special Large-Scale Industries (LSI) Outside EOIP<br><small style='color:#64748b;'>096_Maharashtra-State-Export-Promotion-Policy-2023.pdf</small></td>
+<td><strong>#858</strong> Special Export Promotion Package for Special Large-Scale Industries (LSI) Within EOIP<br><small style='color:#64748b;'>096_Maharashtra-State-Export-Promotion-Policy-2023.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'special capital incentive (technology upgradation)': INR 10,000,000 vs INR 15,000,000.</td></tr>
+<tr><td>#1321</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1192</strong> Educational Assistance for Children 1st to 10th Standard<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1193</strong> Educational Assistance for 10th, 12th, Higher Secondary and Graduation<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'educational assistance': INR 5,000 vs INR 10,000.</td></tr>
+<tr><td>#1322</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1192</strong> Educational Assistance for Children 1st to 10th Standard<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1194</strong> Educational Assistance for Medical, Engineering, Diploma, Post-Graduation and MS-CIT<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'educational assistance': INR 5,000 vs INR 20,000.</td></tr>
+<tr><td>#1323</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1193</strong> Educational Assistance for 10th, 12th, Higher Secondary and Graduation<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1194</strong> Educational Assistance for Medical, Engineering, Diploma, Post-Graduation and MS-CIT<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'educational assistance': INR 10,000 vs INR 20,000.</td></tr>
+<tr><td>#1324</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1195</strong> Financial Assistance for Natural and Cesarean Delivery<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1198</strong> Financial Assistance for 75% Disability<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 20,000 vs INR 200,000.</td></tr>
+<tr><td>#1325</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1195</strong> Financial Assistance for Natural and Cesarean Delivery<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1199</strong> Financial Assistance on Death During Employment<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 20,000 vs INR 500,000.</td></tr>
+<tr><td>#1326</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1195</strong> Financial Assistance for Natural and Cesarean Delivery<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1200</strong> Financial Assistance on Natural Death (Age 51 to 60)<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 20,000 vs INR 200,000.</td></tr>
+<tr><td>#1327</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1195</strong> Financial Assistance for Natural and Cesarean Delivery<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1203</strong> Financial Assistance to Widow or Widower<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 20,000 vs INR 24,000.</td></tr>
+<tr><td>#1328</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1195</strong> Financial Assistance for Natural and Cesarean Delivery<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1208</strong> Financial Assistance for Daughter's Marriage<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 20,000 vs INR 51,000.</td></tr>
+<tr><td>#1329</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1198</strong> Financial Assistance for 75% Disability<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1199</strong> Financial Assistance on Death During Employment<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 200,000 vs INR 500,000.</td></tr>
+<tr><td>#1330</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1198</strong> Financial Assistance for 75% Disability<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1203</strong> Financial Assistance to Widow or Widower<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 200,000 vs INR 24,000.</td></tr>
+<tr><td>#1331</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1198</strong> Financial Assistance for 75% Disability<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1208</strong> Financial Assistance for Daughter's Marriage<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 200,000 vs INR 51,000.</td></tr>
+<tr><td>#1332</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1199</strong> Financial Assistance on Death During Employment<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1200</strong> Financial Assistance on Natural Death (Age 51 to 60)<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 500,000 vs INR 200,000.</td></tr>
+<tr><td>#1333</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1199</strong> Financial Assistance on Death During Employment<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1203</strong> Financial Assistance to Widow or Widower<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 500,000 vs INR 24,000.</td></tr>
+<tr><td>#1334</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1199</strong> Financial Assistance on Death During Employment<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1208</strong> Financial Assistance for Daughter's Marriage<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 500,000 vs INR 51,000.</td></tr>
+<tr><td>#1335</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1200</strong> Financial Assistance on Natural Death (Age 51 to 60)<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1203</strong> Financial Assistance to Widow or Widower<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 200,000 vs INR 24,000.</td></tr>
+<tr><td>#1336</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1200</strong> Financial Assistance on Natural Death (Age 51 to 60)<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1208</strong> Financial Assistance for Daughter's Marriage<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 200,000 vs INR 51,000.</td></tr>
+<tr><td>#1337</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1203</strong> Financial Assistance to Widow or Widower<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1208</strong> Financial Assistance for Daughter's Marriage<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'financial assistance': INR 24,000 vs INR 51,000.</td></tr>
+<tr><td>#1338</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1206</strong> Pradhan Mantri Jeevan Jyoti Bima Yojana Premium<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td><strong>#1207</strong> Pradhan Mantri Suraksha Bima Yojana Premium<br><small style='color:#64748b;'>483_rts-services-gazette-4th-september-2025_0.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'premium subsidy': INR 330 vs INR 12.</td></tr>
+<tr><td>#1361</td><td><span class='badge badge-conflict'>POSSIBLE_CONFLICT</span></td>
+<td><strong>#1265</strong> Package of export incentives for Special Large-Scale Industries (LSI) Outside EOIP<br><small style='color:#64748b;'>502_export-policy-2023-gr-english.pdf</small></td>
+<td><strong>#1266</strong> Package of export incentives for Special Large-Scale Industries (LSI) within EOIP<br><small style='color:#64748b;'>502_export-policy-2023-gr-english.pdf</small></td>
+<td>Conflicting maximum amounts for incentive 'special capital incentive (technology upgradation)': INR 10,000,000 vs INR 15,000,000.</td></tr>
+<tr><td>#699</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#561</strong> Integrated IT Township Land Use and Planning Norms<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td><strong>#788</strong> Integrated IT Township FSI and Planning<br><small style='color:#64748b;'>050_Information Technology Policy (IT_ITES_Policy_2015_final_English).pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#709</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#31</strong> Green Industrialization Assistance<br><small style='color:#64748b;'>053_Package Scheme of Incentives - 2019.pdf</small></td>
+<td><strong>#943</strong> Green Industrialization Assistance<br><small style='color:#64748b;'>101_Package-Scheme-of-Incentives-2019.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#759</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#241</strong> Electricity Duty Concession for Cold Chains and Food Processing<br><small style='color:#64748b;'>010b_Implementation of Maharashtra Food Processing Policy 2017.pdf</small></td>
+<td><strong>#244</strong> Electricity Duty Concession for Cold Chains and Agro-Processing Units<br><small style='color:#64748b;'>010b_Implementation of Maharashtra Food Processing Policy 2017.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#763</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#972</strong> Special Incentives for Industries in Agro & Food Processing, Green energy/ bio-fuel and Industry 4.0<br><small style='color:#64748b;'>100_Maharashtra-Industrial-Policy-2019.pdf</small></td>
+<td><strong>#1282</strong> Special Incentives for Agro & Food Processing, Green Energy/Bio-fuel and Industry 4.0<br><small style='color:#64748b;'>507_maharashtra-new-industrial-policy-2019-english.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#874</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#71</strong> Special Capital Incentives for Small Logistics Park<br><small style='color:#64748b;'>025a_Maharashtra Logistics Policy 2024 - GR.pdf</small></td>
+<td><strong>#1185</strong> Special Capital Incentives for Small Logistics Park<br><small style='color:#64748b;'>500_doc-20250708-wa0003-english_0.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#888</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#72</strong> Special Capital Incentives for Large Logistics Park<br><small style='color:#64748b;'>025a_Maharashtra Logistics Policy 2024 - GR.pdf</small></td>
+<td><strong>#1186</strong> Special Capital Incentives for Large Logistics Park<br><small style='color:#64748b;'>500_doc-20250708-wa0003-english_0.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#902</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#73</strong> Special Capital Incentives for Mega Logistics Park<br><small style='color:#64748b;'>025a_Maharashtra Logistics Policy 2024 - GR.pdf</small></td>
+<td><strong>#1187</strong> Special Capital Incentives for Mega Logistics Park<br><small style='color:#64748b;'>500_doc-20250708-wa0003-english_0.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#915</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#74</strong> Special Capital Incentives for Ultra Mega Logistics Park<br><small style='color:#64748b;'>025a_Maharashtra Logistics Policy 2024 - GR.pdf</small></td>
+<td><strong>#1188</strong> Special Capital Incentives for Ultra Mega Logistics Park<br><small style='color:#64748b;'>500_doc-20250708-wa0003-english_0.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#936</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#80</strong> Technology Adoption Incentive for MSME Logistics Units<br><small style='color:#64748b;'>025a_Maharashtra Logistics Policy 2024 - GR.pdf</small></td>
+<td><strong>#474</strong> Technology Adoption Incentive for MSMEs in Logistics<br><small style='color:#64748b;'>093_Maharashtra-Logistics-Policy-2024.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#958</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#434</strong> Integrated Logistics Park (ILP) Criteria<br><small style='color:#64748b;'>056l_Maharashtra's Logistics Parks Policy - 2018.pdf</small></td>
+<td><strong>#435</strong> Logistics Park (LP) Criteria<br><small style='color:#64748b;'>056l_Maharashtra's Logistics Parks Policy - 2018.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1015</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#464</strong> Warehousing and Cargo Handling Units<br><small style='color:#64748b;'>093_Maharashtra-Logistics-Policy-2024.pdf</small></td>
+<td><strong>#1178</strong> Warehousing and Cargo Handling Units<br><small style='color:#64748b;'>500_doc-20250708-wa0003-english_0.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1016</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#467</strong> Integrated Truck Terminals<br><small style='color:#64748b;'>093_Maharashtra-Logistics-Policy-2024.pdf</small></td>
+<td><strong>#1181</strong> Integrated Truck Terminals<br><small style='color:#64748b;'>500_doc-20250708-wa0003-english_0.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1124</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#376</strong> Maharashtra Electric Vehicle Policy 2021 Implementation<br><small style='color:#64748b;'>011c_EV Policy GR 2021.pdf</small></td>
+<td><strong>#1027</strong> Maharashtra Electric Vehicle Policy, 2021 Implementation<br><small style='color:#64748b;'>099_E-Vehicle-GR-_Eng_22_July-updated.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1134</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#125</strong> Mineral / Forest based Industries Incentives<br><small style='color:#64748b;'>018b_Maharashtra New Industrial Policy-2019.pdf</small></td>
+<td><strong>#417</strong> Mineral / Forest based Industries Incentive Conditions<br><small style='color:#64748b;'>056f_Industrial Policy - 2019.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1135</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#417</strong> Mineral / Forest based Industries Incentive Conditions<br><small style='color:#64748b;'>056f_Industrial Policy - 2019.pdf</small></td>
+<td><strong>#962</strong> Mineral / Forest based Industries Employment Conditions<br><small style='color:#64748b;'>100_Maharashtra-Industrial-Policy-2019.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1142</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#426</strong> Large Scale Industries Stamp Duty Exemption<br><small style='color:#64748b;'>056f_Industrial Policy - 2019.pdf</small></td>
+<td><strong>#1278</strong> Large Scale Industries Stamp Duty Exemption<br><small style='color:#64748b;'>507_maharashtra-new-industrial-policy-2019-english.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1178</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#446</strong> Maharashtra Textile Policy 2011-2017<br><small style='color:#64748b;'>041_New_Textile_Policy_2011-17_Corrigendum.pdf</small></td>
+<td><strong>#477</strong> Textile Policy of Maharashtra 2011-2017<br><small style='color:#64748b;'>040_New_Maharashtra_Textile_Policy-2011-17.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1210</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#185</strong> Stamp Duty Exemption<br><small style='color:#64748b;'>108_AVGCXR Policy GR 03112025.pdf</small></td>
+<td><strong>#1292</strong> Stamp Duty Exemption<br><small style='color:#64748b;'>506_maharashtra-animation-visual-effects-gaming-comics-and-extended-reality-2_1.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1214</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#187</strong> Power Tariff Subsidy<br><small style='color:#64748b;'>108_AVGCXR Policy GR 03112025.pdf</small></td>
+<td><strong>#1294</strong> Power Tariff Subsidy<br><small style='color:#64748b;'>506_maharashtra-animation-visual-effects-gaming-comics-and-extended-reality-2_1.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1216</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#191</strong> Reimbursement for Quality Certification for AVGC-XR<br><small style='color:#64748b;'>108_AVGCXR Policy GR 03112025.pdf</small></td>
+<td><strong>#1299</strong> Reimbursement for Quality Certification<br><small style='color:#64748b;'>506_maharashtra-animation-visual-effects-gaming-comics-and-extended-reality-2_1.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1229</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#401</strong> Production Cost Incentive - Animation Films<br><small style='color:#64748b;'>006b_AVGCXR_policy08062026.pdf</small></td>
+<td><strong>#402</strong> Production Cost Incentive - Animation Series<br><small style='color:#64748b;'>006b_AVGCXR_policy08062026.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1246</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#530</strong> Buildings of Smart Fintech Centre<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td><strong>#667</strong> Buildings of Smart FinTech Centre<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1258</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#319</strong> Special or Additional Incentives for Ultra Mega/ Anchor Projects<br><small style='color:#64748b;'>001_BambooPolicy2025.pdf</small></td>
+<td><strong>#1242</strong> Special or Additional Incentives for Ultra Mega and Anchor Projects<br><small style='color:#64748b;'>498_bamboo-policy-2025_0.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1285</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#665</strong> Regulation for Development of Biotechnology Parks<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td><strong>#759</strong> Regulation for Development of Biotechnology Parks<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1292</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#726</strong> Special Facilities for Physically Challenged Persons - Site Development<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td><strong>#727</strong> Special Facilities for Physically Challenged Persons - Building Requirements<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1296</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#572</strong> Additional FSI for Medical Institutions<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td><strong>#745</strong> Additional FSI for Medical Institutions<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1297</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#573</strong> Additional FSI for Educational Institutions<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td><strong>#744</strong> Additional FSI for Educational Institutions<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1298</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#655</strong> Eligibility criteria for empanelment of Accredited Architects<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td><strong>#656</strong> Eligibility criteria for empanelment of Accredited Town Planners<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1299</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#656</strong> Eligibility criteria for empanelment of Accredited Town Planners<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td><strong>#657</strong> Eligibility criteria for empanelment of Accredited License Engineer<br><small style='color:#64748b;'>062_Comprehensive Uniform Building Bye Law.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1303</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#1007</strong> Environmental Compensation for Industrial Violations<br><small style='color:#64748b;'>231_Env_compensation_August_2024_Plastic.pdf</small></td>
+<td><strong>#1008</strong> Environmental Compensation for GRAP Violations in NCR<br><small style='color:#64748b;'>231_Env_compensation_August_2024_Plastic.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1312</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#1004</strong> Plastic Waste Management (Amendment) Rules, 2021<br><small style='color:#64748b;'>231_Env_compensation_August_2024_Plastic.pdf</small></td>
+<td><strong>#1006</strong> Plastic Waste Management (Second Amendment) Rules, 2021<br><small style='color:#64748b;'>231_Env_compensation_August_2024_Plastic.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1313</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#912</strong> Storage of hazardous and other wastes<br><small style='color:#64748b;'>331_Used_Oil_HWM_Rules_2016.pdf</small></td>
+<td><strong>#913</strong> Utilisation of hazardous and other wastes<br><small style='color:#64748b;'>331_Used_Oil_HWM_Rules_2016.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1314</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#929</strong> Amalgamation of Consents for Sugar and Co-generation Plants<br><small style='color:#64748b;'>250_GrantofConsent_sugar.pdf</small></td>
+<td><strong>#1038</strong> Consent Amalgamation for Sugar and Co-generation Plants<br><small style='color:#64748b;'>302_Rohq_sugarcircular.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+<tr><td>#1317</td><td><span class='badge badge-uncertain'>UNCERTAIN</span></td>
+<td><strong>#1010</strong> Environmental Compensation for Illegal Ground Water Extraction<br><small style='color:#64748b;'>231_Env_compensation_August_2024_Plastic.pdf</small></td>
+<td><strong>#1011</strong> Environmental Compensation Rates (ECRGW) for Illegal Ground Water Extraction<br><small style='color:#64748b;'>231_Env_compensation_August_2024_Plastic.pdf</small></td>
+<td>Similar rule name and benefits, but differing specific conditions require human review.</td></tr>
+</tbody></table>
+</body></html>

@@ -1,0 +1,20 @@
+{
+  "limits": {
+    "normal_max_pages": 150,
+    "process_max_pages": 5000,
+    "defer_after_pages": 5000,
+    "hard_defer_after_pages": 5000,
+    "max_pdf_size_mb": 500.0
+  },
+  "paths": {
+    "raw_pdfs_dir": "data/raw_pdfs",
+    "database_path": "db/policy_engine.db"
+  },
+  "gemini": {
+    "max_documents": 20
+  },
+  "extraction": {
+    "min_meaningful_characters": 100,
+    "tesseract_cmd": "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+  }
+}

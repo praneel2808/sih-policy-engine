@@ -1,0 +1,44 @@
+# Data & database files
+data/raw_pdfs/*
+!data/raw_pdfs/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/ocr/*
+!data/ocr/.gitkeep
+data/output/*
+!data/output/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+db/*.db
+db/*.sqlite
+logs/*.log
+!logs/.gitkeep
+
+# Python cache, virtualenvs & logs
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.env
+.env.local
+.env.*.local
+
+# Node & Next.js frontend builds
+node_modules/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel/
+frontend/*.tsbuildinfo
+
+# IDE, OS & System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
