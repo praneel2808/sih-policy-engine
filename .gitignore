@@ -1,4 +1,4 @@
-# Data & database files
+# Data files
 data/raw_pdfs/*
 !data/raw_pdfs/.gitkeep
 data/processed/*
@@ -7,11 +7,6 @@ data/ocr/*
 !data/ocr/.gitkeep
 data/output/*
 !data/output/.gitkeep
-*.db
-*.sqlite
-*.sqlite3
-db/*.db
-db/*.sqlite
 logs/*.log
 !logs/.gitkeep
 
