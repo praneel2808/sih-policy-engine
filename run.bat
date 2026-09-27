@@ -27,7 +27,7 @@ echo Using Python: "%PYTHON_EXE%"
 
 echo.
 echo [1/2] Launching Backend API on http://127.0.0.1:8000 ...
-start "UIAS - Backend API (Port 8000)" cmd /k "cd /d "%~dp0" && set "PYTHONPATH=%~dp0" && "%PYTHON_EXE%" -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000"
+start "UIAS - Backend API (Port 8000)" cmd /k "cd /d "%~dp0" && set "PYTHONPATH=%~dp0" && "%PYTHON_EXE%" -m uvicorn src.api.main:app --host 0.0.0.0 --port 8000"
 
 echo Waiting for backend API to initialize...
 timeout /t 3 /nobreak >nul

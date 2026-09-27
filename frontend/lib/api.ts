@@ -7,11 +7,34 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 export async function submitAssessment(
   profile: ApplicantProfile
 ): Promise<AssessmentResponse> {
-  const res = await fetch(`${API_BASE}/api/assessment`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(profile),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/api/assessment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(profile),
+    });
+  } catch {
+    if (API_BASE.includes("localhost")) {
+      try {
+        const fallbackUrl = API_BASE.replace("localhost", "127.0.0.1");
+        res = await fetch(`${fallbackUrl}/api/assessment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(profile),
+        });
+      } catch {
+        throw new Error(
+          `Network Error: Could not connect to the Backend API at ${API_BASE}. Please ensure the backend server is running on port 8000.`
+        );
+      }
+    } else {
+      throw new Error(
+        `Network Error: Could not connect to the Backend API at ${API_BASE}. Please ensure the backend server is running on port 8000.`
+      );
+    }
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
     let errorMsg = "Assessment request failed";
