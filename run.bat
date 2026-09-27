@@ -10,17 +10,37 @@ echo ====================================================================
 :: Set PYTHONPATH to current directory so python imports src cleanly
 set "PYTHONPATH=%~dp0;%PYTHONPATH%"
 
-:: Resolve Python executable
-if exist "%~dp0.venv-win\Scripts\python.exe" (
-    set "PYTHON_EXE=%~dp0.venv-win\Scripts\python.exe"
-) else if exist "%~dp0..\.venv-win\Scripts\python.exe" (
-    set "PYTHON_EXE=%~dp0..\.venv-win\Scripts\python.exe"
-) else if exist "%~dp0.venv\Scripts\python.exe" (
+:: 1. Resolve Python executable (or create .venv if missing)
+if exist "%~dp0.venv\Scripts\python.exe" (
     set "PYTHON_EXE=%~dp0.venv\Scripts\python.exe"
-) else if exist "%~dp0..\.venv\Scripts\python.exe" (
-    set "PYTHON_EXE=%~dp0..\.venv\Scripts\python.exe"
+) else if exist "%~dp0.venv-win\Scripts\python.exe" (
+    set "PYTHON_EXE=%~dp0.venv-win\Scripts\python.exe"
 ) else (
-    set "PYTHON_EXE=python"
+    echo.
+    echo [*] No local virtual environment found. Creating .venv...
+    where py >nul 2>&1
+    if %errorlevel% equ 0 (
+        py -m venv "%~dp0.venv"
+    ) else (
+        python -m venv "%~dp0.venv"
+    )
+    if exist "%~dp0.venv\Scripts\python.exe" (
+        set "PYTHON_EXE=%~dp0.venv\Scripts\python.exe"
+        echo [*] Installing backend dependencies from requirements.txt...
+        "%~dp0.venv\Scripts\python.exe" -m pip install -r "%~dp0requirements.txt"
+    ) else (
+        echo [WARNING] Could not create virtual environment. Falling back to system python.
+        set "PYTHON_EXE=python"
+    )
+)
+
+:: 2. Check frontend dependencies (run npm install if missing)
+if not exist "%~dp0frontend\node_modules" (
+    echo.
+    echo [*] Frontend dependencies not found. Installing via npm...
+    pushd "%~dp0frontend"
+    call npm install
+    popd
 )
 
 echo Using Python: "%PYTHON_EXE%"
