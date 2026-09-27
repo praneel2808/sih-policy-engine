@@ -137,7 +137,7 @@ function HighwayPhaseIcon({ step }: { step: string }) {
     case '04':
       return (
         <svg className="w-5 h-5 text-purple-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.5 4.5H6.5h3a4 4 0 010 8H6.5m3 0 5 8M6.5 8.5h11" />
         </svg>
       );
     default:
@@ -720,7 +720,7 @@ function AssessInner() {
               <p className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
                   <svg className="w-3.5 h-3.5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 19L8.5 5h7L20 19M4 19h16M12 7v2m0 3v2m0 3v2" />
                   </svg>
                 </div>
                 <span>{t('dash.highway_title', 'Maharashtra Industrial Clearance Highway')}</span>

@@ -98,7 +98,7 @@ function DeptIcon({ authority }: { authority: string }) {
   if (lower.includes('gst') || lower.includes('tax')) {
     return (
       <svg className="w-4.5 h-4.5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.5 4.5H6.5h3a4 4 0 010 8H6.5m3 0 5 8M6.5 8.5h11" />
       </svg>
     );
   }
@@ -136,7 +136,7 @@ function TabIcon({ id, className = "w-4 h-4 shrink-0" }: { id: Tab; className?: 
     case 'incentives':
       return (
         <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.5 4.5H6.5h3a4 4 0 010 8H6.5m3 0 5 8M6.5 8.5h11" />
         </svg>
       );
     case 'documents':
@@ -509,7 +509,7 @@ export default function ResultsPage() {
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
                   <svg className="w-4.5 h-4.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.5 4.5H6.5h3a4 4 0 010 8H6.5m3 0 5 8M6.5 8.5h11" />
                   </svg>
                 </div>
                 <h2 className="font-bold text-slate-900 text-sm">{t('res.incentives_title', 'Incentives, Subsidies & Amortization')}</h2>
