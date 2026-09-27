@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   title: 'MAITRI Single Window — Unified Industrial Approval System',
   description:
     'Statutory approval and incentive evaluation engine for industrial projects in Maharashtra.',
+  icons: {
+    icon: [
+      { url: '/maharashtra-emblem.png', type: 'image/png' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
+    shortcut: '/maharashtra-emblem.png',
+    apple: '/maharashtra-emblem.png',
+  },
 };
 
 export default function RootLayout({
@@ -22,6 +30,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={plusJakarta.className}>
+      <head>
+        <link rel="icon" href="/maharashtra-emblem.png" type="image/png" sizes="any" />
+        <link rel="shortcut icon" href="/maharashtra-emblem.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/maharashtra-emblem.png" />
+      </head>
       <body className="min-h-screen bg-slate-100/90 text-slate-900 antialiased selection:bg-blue-600 selection:text-white">
         <LanguageProvider>{children}</LanguageProvider>
       </body>

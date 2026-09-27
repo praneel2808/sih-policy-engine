@@ -221,10 +221,10 @@ export default function IncentiveCalculator({
       return;
     }
     let calculatedInr = 0;
-    if (inputUnit === 'Cr') calculatedInr = Math.min(1000 * 1e7, parsed * 1e7);
-    else if (inputUnit === 'Lakh') calculatedInr = Math.min(1000 * 1e7, parsed * 1e5);
-    else if (inputUnit === 'K') calculatedInr = Math.min(1000 * 1e7, parsed * 1e3);
-    else calculatedInr = Math.min(1000 * 1e7, parsed);
+    if (inputUnit === 'Cr') calculatedInr = parsed * 1e7;
+    else if (inputUnit === 'Lakh') calculatedInr = parsed * 1e5;
+    else if (inputUnit === 'K') calculatedInr = parsed * 1e3;
+    else calculatedInr = parsed;
 
     setInvestmentInr(Math.round(calculatedInr));
   }
@@ -384,7 +384,9 @@ export default function IncentiveCalculator({
                   value={directInputValue}
                   onChange={(e) => handleDirectInputChange(e.target.value)}
                   placeholder={lang === 'mr' ? 'थेट रक्कम' : lang === 'hi' ? 'सटीक राशि' : 'Direct value'}
-                  className="w-full pl-6 pr-2.5 py-1.5 text-xs font-mono font-bold bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+                  className={`w-full pl-6 pr-2.5 py-1.5 text-xs font-mono font-bold border rounded-lg text-slate-900 focus:outline-none focus:ring-2 shadow-2xs ${
+                    investmentInr > 10_000_000_000 ? 'border-amber-400 bg-amber-50/50 focus:ring-amber-500' : 'bg-white border-slate-300 focus:ring-blue-500'
+                  }`}
                   aria-label="Direct Capital Investment Numeric Input"
                 />
               </div>
@@ -399,6 +401,30 @@ export default function IncentiveCalculator({
                 <option value="INR">{lang === 'mr' ? 'रुपये (INR)' : lang === 'hi' ? 'रुपये (INR)' : 'Rupees (₹)'}</option>
               </select>
             </div>
+
+            {/* High Capital Investment Warning Notice */}
+            {investmentInr > 10_000_000_000 && (
+              <div className="flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-900 text-xs font-medium animate-in fade-in duration-200">
+                <svg className="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div className="space-y-0.5">
+                  <p className="font-bold text-[11px] uppercase tracking-wider text-amber-950">
+                    {lang === 'mr' ? '⚠️ उच्च भांडवली गुंतवणूक इशारा' : lang === 'hi' ? '⚠️ उच्च पूंजी निवेश चेतावनी' : '⚠️ High Capital Investment Warning'}
+                  </p>
+                  <p className="text-[11px] leading-relaxed text-amber-900">
+                    {lang === 'mr'
+                      ? `तुम्ही ${formatRupees(investmentInr, lang)} प्रविष्ट केले आहे. कृपया तुमची प्रविष्ट केलेली रक्कम आणि एकक (${inputUnit}) बरोबर असल्याचे तपासा.`
+                      : lang === 'hi'
+                      ? `आपने ${formatRupees(investmentInr, lang)} दर्ज किया है। कृपया जांच लें कि आपकी प्रविष्ट संख्या और इकाई (${inputUnit}) सही हैं।`
+                      : `You have entered ${formatRupees(investmentInr, lang)}. Please double-check your entered value and unit selection (${inputUnit}).`}
+                  </p>
+                  <p className="text-[10px] text-amber-800 italic">
+                    {t('calc.hpcc_note', 'Note: Ultra-Mega projects above ₹1,000 Cr receive customized High-Power Cabinet Committee (HPCC) approvals.')}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Continuous Slider spanning ₹0 to ₹1,000 Cr */}
             <input

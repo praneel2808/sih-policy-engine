@@ -3,3 +3,87 @@
 html {
   font-size: 112.5%;
 }
+
+/* Regional Devanagari (Marathi & Hindi) text size & line-height boost */
+html[data-lang="mr"],
+html[data-lang="hi"] {
+  font-size: 122%;
+}
+
+html[data-lang="mr"] p,
+html[data-lang="hi"] p,
+html[data-lang="mr"] span,
+html[data-lang="hi"] span {
+  line-height: 1.65;
+  letter-spacing: 0.015em;
+}
+
+html[data-lang="mr"] .text-xs,
+html[data-lang="hi"] .text-xs {
+  font-size: 0.925rem;
+  line-height: 1.65;
+}
+
+html[data-lang="mr"] .text-\[11px\],
+html[data-lang="hi"] .text-\[11px\],
+html[data-lang="mr"] .text-\[10px\],
+html[data-lang="hi"] .text-\[10px\] {
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print\:hidden,
+  .no-print,
+  header,
+  footer,
+  aside,
+  button,
+  .ai-support-widget {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+  }
+
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-2xl {
+    box-shadow: none !important;
+  }
+
+  /* Prevent awkward page breaks inside cards */
+  section,
+  article,
+  .print-break-inside-avoid,
+  .border {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

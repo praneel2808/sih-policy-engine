@@ -448,6 +448,14 @@ function WizardInner() {
               ? ` — ₹${Number(profile.investment_inr).toLocaleString('en-IN')}`
               : ''}
           </p>
+          {profile.investment_inr !== undefined && profile.investment_inr > 10_000_000_000 && (
+            <div className="mt-2 p-2.5 bg-amber-50 border border-amber-300 rounded-lg text-amber-900 text-xs flex items-center gap-2">
+              <span>⚠️</span>
+              <span>
+                <strong>High Investment Warning:</strong> You entered ₹{(profile.investment_inr / 1e7).toLocaleString('en-IN')} Cr. Please verify that this amount is in Rupees (e.g. 10 Cr = 100000000).
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">

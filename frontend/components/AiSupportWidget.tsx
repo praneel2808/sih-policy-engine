@@ -84,7 +84,7 @@ export default function AiSupportWidget() {
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-50">
+    <div className="fixed bottom-5 right-5 z-50 print:hidden">
       {/* Floating Trigger Button */}
       {!isOpen && (
         <button

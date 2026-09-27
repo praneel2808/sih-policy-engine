@@ -1,4 +1,4 @@
-# Data files
+# Data files & Storage
 data/raw_pdfs/*
 !data/raw_pdfs/.gitkeep
 data/processed/*
@@ -10,27 +10,38 @@ data/output/*
 logs/*.log
 !logs/.gitkeep
 
-# Python virtual environments & environment variables
+# Python Virtual Environments & Environment Variables
+.venv
 .venv/
 .venv*/
+*.venv
+*.venv/
+venv
 venv/
 venv*/
+env
 env/
 ENV/
 env.bak/
 venv.bak/
+.venv-win
 .venv-win/
+.venv-win*/
+.venv-linux/
+.venv-mac/
 .env
 .env.local
 .env.*.local
 
-# Python bytecode & cache
+# Python Bytecode & Caches
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+*.egg-info/
+pip-wheel-metadata/
 
-# Node & Next.js frontend builds
+# Node & Next.js Frontend Builds
 node_modules/
 frontend/node_modules/
 frontend/.next/
@@ -39,7 +50,7 @@ frontend/build/
 frontend/.vercel/
 frontend/*.tsbuildinfo
 
-# IDE, OS & System files
+# IDE, OS & System Files
 .vscode/
 .idea/
 .DS_Store

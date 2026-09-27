@@ -30,7 +30,7 @@ export default function SourceModal({
   if (!source) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm print:hidden">
       {/* Click-away backdrop */}
       <div className="absolute inset-0" onClick={onClose} aria-label="Close modal background" />
 

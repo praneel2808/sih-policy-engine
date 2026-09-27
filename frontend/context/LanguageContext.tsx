@@ -613,6 +613,27 @@ const TRANSLATIONS: Record<string, Record<Language, string>> = {
   'bot.hl_mpcb_sub': { en: 'Pollution Consent Technical Aid', mr: 'प्रदूषण संमती तांत्रिक सहाय्य', hi: 'प्रदूषण सहमति तकनीकी सहायता' },
   'bot.hl_midc': { en: 'MIDC Head Office', mr: 'MIDC मुख्यालय', hi: 'MIDC मुख्यालय' },
   'bot.hl_midc_sub': { en: 'Industrial Plots & Allotment', mr: 'औद्योगिक भूखंड व वाटप', hi: 'औद्योगिक भूखंड एवं आवंटन' },
+
+  // Status Badges & Letterhead
+  'status.applicable': { en: 'Applicable', mr: 'लागू', hi: 'लागू' },
+  'status.required': { en: 'Required', mr: 'आवश्यक', hi: 'आवश्यक' },
+  'status.pending': { en: 'Pending', mr: 'प्रलंबित', hi: 'लंबित' },
+  'status.na': { en: 'N/A', mr: 'लागू नाही', hi: 'लागू नहीं' },
+  'status.verify': { en: 'Verify', mr: 'पडताळणी करा', hi: 'सत्यापित करें' },
+  'letterhead.dept': { en: 'Government of Maharashtra · Industry & Investment Department', mr: 'महाराष्ट्र शासन · उद्योग आणि गुंतवणूक विभाग', hi: 'महाराष्ट्र सरकार · उद्योग एवं निवेश विभाग' },
+  'letterhead.dossier_title': { en: 'OFFICIAL INDUSTRIAL CLEARANCE & INCENTIVE DOSSIER', mr: 'अधिकृत औद्योगिक मंजुरी व सवलत अहवाल', hi: 'आधिकारिक औद्योगिक स्वीकृति और प्रोत्साहन डोजियर' },
+  'letterhead.system_sub': { en: 'MAITRI Single Window Clearance System · Gazette Ref: GR-PSI-2019/CR-48/IND-8', mr: 'मैत्री एक खिडकी मंजुरी प्रणाली · राजपत्र संदर्भ: GR-PSI-2019/CR-48/IND-8', hi: 'मैत्री एकल खिड़की स्वीकृति प्रणाली · राजपत्र संदर्भ: GR-PSI-2019/CR-48/IND-8' },
+  'res.default_project_name': { en: 'Industrial Project', mr: 'औद्योगिक प्रकल्प', hi: 'औद्योगिक परियोजना' },
+  'res.date_label': { en: 'Date:', mr: 'तारीख:', hi: 'तिथि:' },
+  'res.demo_run': { en: 'Demo Run', mr: 'डेमो प्रकल्प', hi: 'डेमो रन' },
+  'res.verified_badge': { en: 'VERIFIED', mr: 'सत्यापित', hi: 'सत्यापित' },
+  'res.gazette_ref': { en: 'Gazette Ref: GR-PSI-2019/CR-48/IND-8', mr: 'राजपत्र संदर्भ: GR-PSI-2019/CR-48/IND-8', hi: 'राजपत्र संदर्भ: GR-PSI-2019/CR-48/IND-8' },
+  'res.form_no': { en: 'Form №', mr: 'अर्ज क्रमांक', hi: 'फॉर्म संख्या' },
+  'form_type.application': { en: 'Application', mr: 'अर्ज', hi: 'आवेदन' },
+  'form_type.undertaking': { en: 'Undertaking', mr: 'हमीपत्र', hi: 'वचन पत्र' },
+  'form_type.affidavit': { en: 'Affidavit', mr: 'प्रतिज्ञापत्र', hi: 'हलफनामा' },
+  'form_type.proforma': { en: 'Proforma', mr: 'प्रपत्र', hi: 'प्रपत्र' },
+  'form_type.checklist': { en: 'Checklist', mr: 'पडताळणी यादी', hi: 'चेकलिस्ट' },
 };
 
 const LanguageContext = createContext<LanguageContextType>({
@@ -626,14 +647,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem('smsws_lang') as Language;
-    if (saved === 'mr' || saved === 'en' || saved === 'hi') {
-      setLangState(saved);
+    const initialLang = (saved === 'mr' || saved === 'en' || saved === 'hi') ? saved : 'en';
+    setLangState(initialLang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-lang', initialLang);
+      document.documentElement.lang = initialLang;
     }
   }, []);
 
   const setLang = (newLang: Language) => {
     setLangState(newLang);
     localStorage.setItem('smsws_lang', newLang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-lang', newLang);
+      document.documentElement.lang = newLang;
+    }
   };
 
   const t = (key: string, defaultText?: string): string => {

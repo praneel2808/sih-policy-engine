@@ -1190,7 +1190,11 @@ function AssessInner() {
 
                               set('investment_inr', amountInr);
 
-                              if (amountInr < currentConfig.minInr || amountInr > currentConfig.maxInr) {
+                              if (amountInr > 10_000_000_000) {
+                                setRangeWarning(
+                                  `⚠️ High Capital Investment Notice: You entered ₹${(amountInr / 1e7).toLocaleString('en-IN')} Cr (₹${amountInr.toLocaleString('en-IN')}). Please recheck your numerical entry to verify the amount is in Rupees.`
+                                );
+                              } else if (amountInr < currentConfig.minInr || amountInr > currentConfig.maxInr) {
                                 setRangeWarning(
                                   `⚠️ Range Mismatch Warning: ₹${amountInr.toLocaleString('en-IN')} is outside your selected range category (${t('rng.' + currentConfig.key, currentConfig.sub)}). Category valid bounds: ${currentConfig.minValDisplay} to ${currentConfig.maxValDisplay}.`
                                 );
