@@ -82,6 +82,13 @@ class ApplicantProfile(BaseModel):
     # Step 5 — Project Stage
     stage: ProjectStage
 
+    # Expanded Rule Fields
+    is_export_oriented: Optional[bool] = Field(False, description="100% EOU or export oriented unit")
+    women_led_enterprise: Optional[bool] = Field(False, description="Enterprise run by women entrepreneurs")
+    student_led_enterprise: Optional[bool] = Field(False, description="Enterprise run by student entrepreneurs")
+    taluka_category: Optional[str] = Field(None, description="A, B, C, D, D+, Naxal Affected, No Industry District")
+    built_up_area_sqft: Optional[float] = Field(None, ge=0, description="Built up area in sq. feet for IT/Logistics Parks")
+
     @field_validator("pan")
     @classmethod
     def validate_pan(cls, v: Optional[str]) -> Optional[str]:

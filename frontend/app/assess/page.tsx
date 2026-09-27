@@ -1140,7 +1140,7 @@ function AssessInner() {
               {/* Utility & Location Specifics */}
               <div className="pt-2 border-t border-slate-200/80">
                 <p className="text-xs font-semibold text-slate-700 mb-3">Site Utilities & Additional Parameters (Optional)</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
                     <FieldLabel>Power Requirement (kW)</FieldLabel>
                     <input
@@ -1155,7 +1155,7 @@ function AssessInner() {
                   </div>
 
                   <div>
-                    <FieldLabel>Taluka</FieldLabel>
+                    <FieldLabel>Taluka Name</FieldLabel>
                     <input
                       type="text"
                       placeholder="e.g. Haveli"
@@ -1176,6 +1176,77 @@ function AssessInner() {
                       className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                     />
                   </div>
+
+                  <div>
+                    <FieldLabel>Taluka Classification</FieldLabel>
+                    <select
+                      value={profile.taluka_category ?? ''}
+                      onChange={(e) => set('taluka_category', e.target.value)}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    >
+                      <option value="">-- Select Category --</option>
+                      <option value="A">A (Developed)</option>
+                      <option value="B">B (Developing)</option>
+                      <option value="C">C (Developing)</option>
+                      <option value="D">D (Backward)</option>
+                      <option value="D+">D+ (Highly Backward)</option>
+                      <option value="Naxal Affected">Naxal Affected Area</option>
+                      <option value="No Industry District">No Industry District</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <FieldLabel>Built-up Area (sq. ft.)</FieldLabel>
+                    <input
+                      type="number"
+                      min={0}
+                      placeholder="For IT/Logistics Parks"
+                      value={profile.built_up_area_sqft ?? ''}
+                      onChange={(e) => set('built_up_area_sqft', e.target.value ? Number(e.target.value) : undefined)}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                  <label className="flex items-start gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={profile.is_export_oriented ?? false}
+                      onChange={(e) => set('is_export_oriented', e.target.checked)}
+                      className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <div>
+                      <p className="text-xs font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">100% Export Oriented (EOU)</p>
+                      <p className="text-[10px] text-slate-500 leading-tight mt-0.5">Applies for specific EOU subsidies</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={profile.women_led_enterprise ?? false}
+                      onChange={(e) => set('women_led_enterprise', e.target.checked)}
+                      className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <div>
+                      <p className="text-xs font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">Women-led Enterprise</p>
+                      <p className="text-[10px] text-slate-500 leading-tight mt-0.5">Triggers women entrepreneur incentives</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={profile.student_led_enterprise ?? false}
+                      onChange={(e) => set('student_led_enterprise', e.target.checked)}
+                      className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <div>
+                      <p className="text-xs font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">Student-led Startup</p>
+                      <p className="text-[10px] text-slate-500 leading-tight mt-0.5">For M-Hub & innovation lab benefits</p>
+                    </div>
+                  </label>
                 </div>
               </div>
             </div>

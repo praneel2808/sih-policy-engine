@@ -46,6 +46,12 @@ export interface ApplicantProfile {
   employment_expected?: number;
 
   stage: ProjectStage;
+
+  is_export_oriented?: boolean;
+  women_led_enterprise?: boolean;
+  student_led_enterprise?: boolean;
+  taluka_category?: string;
+  built_up_area_sqft?: number;
 }
 
 export interface SourceEvidence {

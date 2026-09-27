@@ -48,6 +48,13 @@ def evaluate(profile: ApplicantProfile) -> RuleResult:
     emp = profile.employment_expected or 0
     loc = profile.location_type.value if profile.location_type else ""
     district = (profile.district or "").strip()
+    
+    # New extracted fields
+    is_export = profile.is_export_oriented
+    is_women_led = profile.women_led_enterprise
+    is_student_led = profile.student_led_enterprise
+    taluka_cat = profile.taluka_category or ""
+    bua_sqft = profile.built_up_area_sqft or 0
 
     # ── RULE 1: Industrial Policy (universal baseline) ────────────────────────
     result.policies.append({
@@ -374,7 +381,71 @@ def evaluate(profile: ApplicantProfile) -> RuleResult:
             "retrieval_keywords": ["large industry", "mega project", "investment", "crore"],
         })
 
-    # ── RULE 8: General warnings ──────────────────────────────────────────────
+    # ── RULE 8: Expanded Assessment (Demographics & Export) ───────────────────
+    if is_women_led:
+        result.incentives.append({
+            "name": "Women Entrepreneurs Assistance",
+            "status": "potentially_applicable",
+            "reason": (
+                "Women-led enterprises qualify for enhanced capital subsidies, priority "
+                "allocations in hubs, and specific Brand Building and Marketing Assistance "
+                "under MSME / IT / Industrial policies."
+            ),
+        })
+        result.retrieval_hint_keywords.extend(["women entrepreneur", "women-led", "M-Hub"])
+
+    if is_student_led:
+        result.policies.append({
+            "name": "Student Innovation & Startup Framework",
+            "status": "potentially_applicable",
+            "reason": (
+                "Student-led startups are eligible for seat reservations in incubation "
+                "centers (e.g., M-Hub) and specific seed funding support."
+            ),
+            "retrieval_keywords": ["student entrepreneur", "incubation", "M-Hub", "innovation"],
+        })
+
+    if is_export:
+        result.incentives.append({
+            "name": "Export Infrastructure & EOU Subsidies",
+            "status": "potentially_applicable",
+            "reason": (
+                "100% Export Oriented Units (EOU) qualify for specific infrastructure "
+                "support, extended electricity duty exemptions, and priority clearance "
+                "for expansion/diversification."
+            ),
+        })
+        result.retrieval_hint_keywords.extend(["export", "EOU", "infrastructure support"])
+        
+    # ── RULE 9: Taluka Category Enhancements ──────────────────────────────────
+    if taluka_cat in ("D", "D+", "Naxal Affected", "No Industry District"):
+        result.incentives.append({
+            "name": f"Backward Area Premium Subsidy ({taluka_cat} Zone)",
+            "status": "potentially_applicable",
+            "reason": (
+                f"Projects located in {taluka_cat} category talukas are eligible for "
+                "the highest bracket of SGST refunds (up to 100%), power tariff "
+                "subsidies (e.g., ₹2/unit), and electricity duty waivers."
+            ),
+        })
+        result.retrieval_hint_keywords.append(taluka_cat)
+        
+    # ── RULE 10: Logistics & IT Parks Built-up Area ──────────────────────────
+    if sector in ("Logistics", "IT / ITES") and bua_sqft >= 100000:
+        result.approvals.append({
+            "name": "Park Infrastructure Clearance (Large BUA)",
+            "stage": stage,
+            "status": "potentially_required",
+            "reason": (
+                f"Built-up area of {bua_sqft:,.0f} sq.ft. triggers additional "
+                "clearances for Private IT Parks or Multi-Storeyed Logistics Parks, "
+                "including specific FSI / Town Planning approvals."
+            ),
+            "authority": "Local Planning Authority / Directorate of Industries",
+            "retrieval_keywords": ["built up area", "BUA", "park", "logistics park", "FSI"],
+        })
+
+    # ── RULE 11: General warnings ──────────────────────────────────────────────
     if not district:
         result.warnings.append(
             "District not specified. Location-specific incentive categories (A/B/C/D) "

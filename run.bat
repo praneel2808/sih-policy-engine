@@ -1,35 +1,49 @@
 @echo off
-title SMSWS Policy Engine Launcher
+title Unified Industrial Approval System (UIAS) Launcher
 cd /d "%~dp0"
 
-set "PATH=%LOCALAPPDATA%\Programs\nodejs;%LOCALAPPDATA%\Programs\Python\Python311;%LOCALAPPDATA%\Programs\Python\Python311\Scripts;%PATH%"
+echo ====================================================================
+echo  Starting Unified Industrial Approval System (UIAS)
+echo  Government of Maharashtra Single Window Portal
+echo ====================================================================
 
-echo ==================================================
-echo  Starting SMSWS Policy Engine Backend and Frontend
-echo ==================================================
+:: Set PYTHONPATH to current directory so python imports src cleanly
+set "PYTHONPATH=%~dp0;%PYTHONPATH%"
 
-:: Check for virtual environment python
-if exist ".venv-win\Scripts\python.exe" (
-    set "PYTHON_EXE=.venv-win\Scripts\python.exe"
-) else if exist ".venv\Scripts\python.exe" (
-    set "PYTHON_EXE=.venv\Scripts\python.exe"
+:: Resolve Python executable
+if exist "%~dp0.venv-win\Scripts\python.exe" (
+    set "PYTHON_EXE=%~dp0.venv-win\Scripts\python.exe"
+) else if exist "%~dp0..\.venv-win\Scripts\python.exe" (
+    set "PYTHON_EXE=%~dp0..\.venv-win\Scripts\python.exe"
+) else if exist "%~dp0.venv\Scripts\python.exe" (
+    set "PYTHON_EXE=%~dp0.venv\Scripts\python.exe"
+) else if exist "%~dp0..\.venv\Scripts\python.exe" (
+    set "PYTHON_EXE=%~dp0..\.venv\Scripts\python.exe"
 ) else (
     set "PYTHON_EXE=python"
 )
 
-echo Starting Backend API on http://127.0.0.1:8000 in a new window...
-start "SMSWS - Backend API (Port 8000)" cmd /k ""%PYTHON_EXE%" -m uvicorn src.api.main:app --port 8000"
-
-echo Waiting 2 seconds for backend to start...
-timeout /t 2 /nobreak >nul
-
-echo Starting Frontend UI on http://localhost:3000 in a new window...
-start "SMSWS - Frontend (Port 3000)" cmd /k "cd frontend && npm run dev"
+echo Using Python: "%PYTHON_EXE%"
 
 echo.
-echo Both servers have been launched!
-echo - Backend:  http://127.0.0.1:8000 (Docs: http://127.0.0.1:8000/docs)
-echo - Frontend: http://localhost:3000
+echo [1/2] Launching Backend API on http://127.0.0.1:8000 ...
+start "UIAS - Backend API (Port 8000)" cmd /k "cd /d "%~dp0" && set "PYTHONPATH=%~dp0" && "%PYTHON_EXE%" -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000"
+
+echo Waiting for backend API to initialize...
+timeout /t 3 /nobreak >nul
+
 echo.
-echo (You can close this window now. The servers will continue running in their own windows.)
+echo [2/2] Launching Frontend Web App on http://localhost:3000 ...
+start "UIAS - Frontend Portal (Port 3000)" cmd /k "cd /d "%~dp0frontend" && npm run dev"
+
+echo.
+echo ====================================================================
+echo  Unified Industrial Approval System is now running!
+echo ====================================================================
+echo  - Frontend Portal:  http://localhost:3000
+echo  - Backend API:      http://127.0.0.1:8000
+echo  - API Swagger Docs: http://127.0.0.1:8000/docs
+echo ====================================================================
+echo.
+echo (Do not close the backend and frontend command windows while using the portal.)
 pause
