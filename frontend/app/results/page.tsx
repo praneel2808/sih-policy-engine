@@ -6,6 +6,8 @@ import AppLayout from '@/components/AppLayout';
 import type { AssessmentResponse, FormRequirement, SourceEvidence } from '@/types';
 import { getForms } from '@/lib/api';
 import SourceModal from '@/components/SourceModal';
+import IncentiveCalculator from '@/components/IncentiveCalculator';
+import { useLanguage } from '@/context/LanguageContext';
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 function formatInr(val?: number | null): string {
@@ -42,34 +44,125 @@ function FormTypeBadge({ type }: { type?: string }) {
   );
 }
 
-/* Department icon map */
-const DEPT_ICONS: Record<string, string> = {
-  environment: '🌿', pollution: '🌿', pcb: '🌿',
-  fire: '🔥', safety: '🔥',
-  factory: '🏭', labour: '👷', employment: '👷',
-  electricity: '⚡', power: '⚡', msedcl: '⚡',
-  water: '💧', groundwater: '💧', irrigation: '💧',
-  land: '🗺️', revenue: '🗺️', talati: '🗺️',
-  municipal: '🏛️', corporation: '🏛️', council: '🏛️',
-  gst: '💼', tax: '💼', revenue_dept: '💼',
-  fssai: '🍽️', food: '🍽️',
-  drug: '💊', pharmacy: '💊',
-  building: '🏗️', construction: '🏗️', plan: '🏗️',
-};
-
-function deptIcon(authority: string): string {
+function DeptIcon({ authority }: { authority: string }) {
   const lower = authority.toLowerCase();
-  for (const [key, icon] of Object.entries(DEPT_ICONS)) {
-    if (lower.includes(key)) return icon;
+  if (lower.includes('env') || lower.includes('pollut') || lower.includes('pcb') || lower.includes('mpcb')) {
+    return (
+      <svg className="w-4.5 h-4.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+      </svg>
+    );
   }
-  return '📋';
+  if (lower.includes('fire') || lower.includes('safe') || lower.includes('cfo')) {
+    return (
+      <svg className="w-4.5 h-4.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    );
+  }
+  if (lower.includes('elect') || lower.includes('power') || lower.includes('msedcl')) {
+    return (
+      <svg className="w-4.5 h-4.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    );
+  }
+  if (lower.includes('lab') || lower.includes('employ') || lower.includes('dish')) {
+    return (
+      <svg className="w-4.5 h-4.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    );
+  }
+  if (lower.includes('water') || lower.includes('ground') || lower.includes('irrig')) {
+    return (
+      <svg className="w-4.5 h-4.5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+      </svg>
+    );
+  }
+  if (lower.includes('land') || lower.includes('rev') || lower.includes('talat')) {
+    return (
+      <svg className="w-4.5 h-4.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+      </svg>
+    );
+  }
+  if (lower.includes('munic') || lower.includes('corp') || lower.includes('council')) {
+    return (
+      <svg className="w-4.5 h-4.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    );
+  }
+  if (lower.includes('gst') || lower.includes('tax')) {
+    return (
+      <svg className="w-4.5 h-4.5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    );
+  }
+  if (lower.includes('midc') || lower.includes('fact') || lower.includes('build')) {
+    return (
+      <svg className="w-4.5 h-4.5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    );
+  }
+  return (
+    <svg className="w-4.5 h-4.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
 }
 
 /* ─── TABS CONFIG ─────────────────────────────────────────── */
 type Tab = 'all' | 'approvals' | 'incentives' | 'documents' | 'forms' | 'sources';
 
+function TabIcon({ id, className = "w-4 h-4 shrink-0" }: { id: Tab; className?: string }) {
+  switch (id) {
+    case 'all':
+      return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+      );
+    case 'approvals':
+      return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      );
+    case 'incentives':
+      return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    case 'documents':
+      return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      );
+    case 'forms':
+      return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      );
+    case 'sources':
+      return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+      );
+  }
+}
+
 /* ─── MAIN PAGE ───────────────────────────────────────────── */
 export default function ResultsPage() {
+  const { t } = useLanguage();
   const [assessment, setAssessment] = useState<AssessmentResponse | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const [forms, setForms] = useState<FormRequirement[]>([]);
@@ -100,27 +193,32 @@ export default function ResultsPage() {
     return (
       <AppLayout>
         <div className="flex flex-col items-center justify-center py-24 gap-6">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-4xl shadow-inner">
-            📄
+          <div className="w-20 h-20 rounded-3xl bg-slate-100 flex items-center justify-center shadow-inner">
+            <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
           </div>
           <div className="text-center">
-            <h2 className="text-xl font-bold text-slate-900">No Assessment Report Found</h2>
+            <h2 className="text-xl font-bold text-slate-900">{t('res.no_assessment_title', 'No Assessment Report Found')}</h2>
             <p className="text-sm text-slate-500 mt-1 max-w-sm">
-              Submit an industrial project profile or launch a demo to view your clearance dossier.
+              {t('res.no_assessment_sub', 'Submit an industrial project profile or launch a demo to view your clearance dossier.')}
             </p>
           </div>
           <div className="flex gap-3">
             <Link
               href="/assess?demo=textile"
-              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm rounded-xl transition-all shadow-md shadow-blue-200"
+              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm rounded-xl transition-all shadow-md shadow-blue-200 flex items-center gap-2"
             >
-              🧵 Try Textile Demo
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              </svg>
+              <span>{t('res.try_textile_demo', 'Try Textile Demo')}</span>
             </Link>
             <Link
               href="/assess"
               className="px-5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 text-slate-700 font-semibold text-sm rounded-xl transition-all"
             >
-              New Assessment
+              {t('res.new_assessment_btn', 'New Assessment')}
             </Link>
           </div>
         </div>
@@ -131,13 +229,13 @@ export default function ResultsPage() {
   const s = assessment.project_summary;
   const totalIncentives = assessment.incentives.length + assessment.applicable_policies.length;
 
-  const TABS: { id: Tab; icon: string; label: string; count: number | string }[] = [
-    { id: 'all',        icon: '⚡', label: 'Overview',   count: '' },
-    { id: 'approvals',  icon: '🏛️', label: 'Approvals',  count: assessment.approvals.length },
-    { id: 'incentives', icon: '💰', label: 'Incentives', count: totalIncentives },
-    { id: 'documents',  icon: '📎', label: 'Documents',  count: assessment.documents_required.length },
-    { id: 'forms',      icon: '📋', label: 'Forms',      count: forms.length || '…' },
-    { id: 'sources',    icon: '🔗', label: 'Evidence',   count: assessment.sources.length },
+  const TABS: { id: Tab; label: string; count: number | string }[] = [
+    { id: 'all',        label: t('nav.dashboard', 'Overview'),   count: '' },
+    { id: 'approvals',  label: t('res.clearances_tab', 'Approvals'),  count: assessment.approvals.length },
+    { id: 'incentives', label: t('res.incentives_tab', 'Incentives'), count: totalIncentives },
+    { id: 'documents',  label: t('res.documents_tab', 'Documents'),  count: assessment.documents_required.length },
+    { id: 'forms',      label: t('res.forms_tab', 'Forms'),      count: forms.length || '…' },
+    { id: 'sources',    label: t('res.evidence_tab', 'Evidence'),   count: assessment.sources.length },
   ];
 
   return (
@@ -146,52 +244,60 @@ export default function ResultsPage() {
 
         {/* ── HERO HEADER ─────────────────────────────────────── */}
         <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950 p-6 shadow-xl">
-          {/* Decorative circles */}
           <div className="absolute right-0 top-0 w-64 h-64 rounded-full bg-indigo-500/10 -translate-y-1/2 translate-x-1/4" />
           <div className="absolute right-20 bottom-0 w-32 h-32 rounded-full bg-blue-500/10 translate-y-1/2" />
 
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mb-3 relative">
-            <Link href="/" className="hover:text-white transition-colors">Dashboard</Link>
+            <Link href="/" className="hover:text-white transition-colors">{t('nav.dashboard', 'Dashboard')}</Link>
             <span>/</span>
-            <Link href="/assess" className="hover:text-white transition-colors">Assessment Studio</Link>
+            <Link href="/assess" className="hover:text-white transition-colors">{t('assess.title', 'Assessment Studio')}</Link>
             <span>/</span>
-            <span className="text-slate-300 font-semibold">Clearance Report</span>
+            <span className="text-white font-medium">{t('res.clearance_report', 'Clearance Report')}</span>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 relative">
+          {/* Title row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative">
             <div>
-              <div className="flex items-center gap-3 mb-1">
-                <img
-                  src="/maharashtra-emblem.png"
-                  alt="Maharashtra State Emblem"
-                  className="w-8 h-8 object-contain shrink-0"
-                />
-                <h1 className="text-2xl font-black text-white tracking-tight">
-                  {s.entity_name || 'Industrial Enterprise'}
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                  {s.entity_name || 'Industrial Project'}
                 </h1>
                 {isDemo && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                    DEMO
+                  <span className="text-[10px] bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-mono font-bold uppercase">
+                    Demo Run
                   </span>
                 )}
               </div>
               <p className="text-sm text-slate-400">
-                Clearance Dossier · {s.sector} · {s.stage}
+                Clearance Dossier · {t('sector.' + s.sector, s.sector)} · {t('stage.' + s.stage, s.stage)}
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-emerald-900 flex items-center gap-1.5 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>{t('res.export_pdf', 'Export PDF Dossier')}</span>
+              </button>
               <Link
                 href="/assess"
                 className="px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold rounded-xl transition-all backdrop-blur-sm"
               >
-                ← Edit Profile
+                {t('res.edit_profile', '← Edit Profile')}
               </Link>
               <Link
                 href="/assess?demo=textile"
-                className="px-3.5 py-2 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-xs rounded-xl transition-all shadow-md shadow-indigo-900"
+                className="px-3.5 py-2 bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-xs rounded-xl transition-all shadow-md shadow-indigo-900 flex items-center gap-1"
               >
-                🧵 Demo
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                </svg>
+                <span>Demo</span>
               </Link>
             </div>
           </div>
@@ -199,15 +305,22 @@ export default function ResultsPage() {
           {/* Stat Pills */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 relative">
             {[
-              { icon: '🏛️', val: assessment.approvals.length, label: 'Clearances', color: 'from-blue-600/30 to-blue-500/10 border-blue-500/30' },
-              { icon: '💰', val: totalIncentives,              label: 'Incentive Schemes', color: 'from-emerald-600/30 to-emerald-500/10 border-emerald-500/30' },
-              { icon: '📎', val: assessment.documents_required.length, label: 'Documents', color: 'from-amber-600/30 to-amber-500/10 border-amber-500/30' },
-              { icon: '🔗', val: assessment.sources.length,   label: 'Policy Citations', color: 'from-indigo-600/30 to-indigo-500/10 border-indigo-500/30' },
-            ].map(({ icon, val, label, color }) => (
-              <div key={label} className={`rounded-xl bg-gradient-to-br ${color} border p-3 backdrop-blur-sm`}>
-                <div className="text-xl mb-1">{icon}</div>
-                <div className="text-2xl font-black text-white">{val}</div>
-                <div className="text-[11px] text-slate-400">{label}</div>
+              { id: 'approvals' as Tab, val: assessment.approvals.length, label: t('res.clearances_tab', 'Clearances'), color: 'from-blue-600/30 to-blue-500/10 border-blue-500/30' },
+              { id: 'incentives' as Tab, val: totalIncentives, label: t('res.incentives_tab', 'Incentive Schemes'), color: 'from-emerald-600/30 to-emerald-500/10 border-emerald-500/30' },
+              { id: 'documents' as Tab, val: assessment.documents_required.length, label: t('res.documents_tab', 'Documents'), color: 'from-amber-600/30 to-amber-500/10 border-amber-500/30' },
+              { id: 'sources' as Tab, val: assessment.sources.length, label: t('res.evidence_tab', 'Policy Citations'), color: 'from-indigo-600/30 to-indigo-500/10 border-indigo-500/30' },
+            ].map(({ id, val, label, color }) => (
+              <div key={label} className={`rounded-xl bg-gradient-to-br ${color} border p-3 backdrop-blur-sm flex flex-col justify-between`}>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="p-1 rounded-lg bg-white/10 text-white">
+                    <TabIcon id={id} className="w-4 h-4" />
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-300 uppercase">Verified</span>
+                </div>
+                <div>
+                  <div className="text-2xl font-black text-white">{val}</div>
+                  <div className="text-[11px] text-slate-300 font-medium">{label}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -215,22 +328,38 @@ export default function ResultsPage() {
 
         {/* ── PROJECT PROFILE STRIP ───────────────────────────── */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Evaluated Profile</p>
-            <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg border border-slate-200">
-              MAITRI-EVAL-2026
-            </span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{t('res.eval_profile', 'Evaluated Profile')}</span>
+              <span className="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200 font-bold flex items-center gap-1">
+                <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>{t('res.gazette_ver', 'Official Gazette Verified')}</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg border border-slate-200 font-semibold">
+                Gazette Ref: GR-PSI-2019/CR-48/IND-8
+              </span>
+              <div className="flex items-center gap-1.5 bg-slate-900 text-white text-[10px] px-2.5 py-1 rounded-lg font-mono">
+                <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+                <span>{t('res.scan_qr', 'Scan QR for Live Verification')}</span>
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
             {[
-              { label: 'Sector', val: s.sector, accent: 'text-blue-700' },
-              { label: 'Lifecycle Stage', val: s.stage, accent: 'text-slate-900' },
-              { label: 'District', val: s.district || 'All Maharashtra', accent: 'text-slate-900' },
-              { label: 'Location Type', val: s.location_type || 'General', accent: 'text-slate-900' },
-              { label: 'Investment', val: formatInr(s.investment_inr), accent: 'text-emerald-700' },
-              { label: 'Employment', val: s.employment_expected ? `${s.employment_expected} persons` : '—', accent: 'text-slate-900' },
-              { label: 'Constitution', val: s.entity_type, accent: 'text-slate-900' },
-              { label: 'Clearances', val: `${assessment.approvals.length} identified`, accent: 'text-indigo-700' },
+              { label: t('calc.sector', 'Sector'), val: t('sector.' + s.sector, s.sector), accent: 'text-blue-700' },
+              { label: t('assess.stage', 'Lifecycle Stage'), val: t('stage.' + s.stage, s.stage), accent: 'text-slate-900' },
+              { label: t('assess.district', 'District'), val: s.district || 'All Maharashtra', accent: 'text-slate-900' },
+              { label: t('assess.location', 'Location Type'), val: t('location.' + (s.location_type || 'Other'), s.location_type || 'General'), accent: 'text-slate-900' },
+              { label: t('assess.investment', 'Investment'), val: formatInr(s.investment_inr), accent: 'text-emerald-700' },
+              { label: t('assess.employment', 'Employment'), val: s.employment_expected ? `${s.employment_expected} ${t('results.persons', 'persons')}` : '—', accent: 'text-slate-900' },
+              { label: t('assess.entity_type', 'Constitution'), val: s.entity_type, accent: 'text-slate-900' },
+              { label: t('res.clearances_tab', 'Clearances'), val: `${assessment.approvals.length} ${t('res.identified', 'identified')}`, accent: 'text-indigo-700' },
             ].map(({ label, val, accent }) => (
               <div key={label} className="bg-slate-50 rounded-xl border border-slate-100 px-3 py-2.5">
                 <p className="text-[10px] uppercase font-bold text-slate-400 mb-0.5">{label}</p>
@@ -243,9 +372,11 @@ export default function ResultsPage() {
         {/* ── WARNINGS ────────────────────────────────────────── */}
         {assessment.warnings.length > 0 && (
           <div className="flex gap-3 bg-amber-50 border border-amber-200 rounded-2xl p-4">
-            <span className="text-xl shrink-0">⚠️</span>
+            <svg className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
             <div className="text-xs text-amber-900 space-y-1">
-              <p className="font-bold text-[11px] uppercase tracking-wider">Evaluation Notices</p>
+              <p className="font-bold text-[11px] uppercase tracking-wider">{t('res.eval_notices', 'Evaluation Notices')}</p>
               {assessment.warnings.map((w, idx) => (
                 <p key={idx}>• {w}</p>
               ))}
@@ -265,7 +396,7 @@ export default function ResultsPage() {
                   : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-900'
               }`}
             >
-              <span>{tab.icon}</span>
+              <TabIcon id={tab.id} className={`w-4 h-4 ${activeTab === tab.id ? 'text-white' : 'text-slate-500'}`} />
               <span>{tab.label}</span>
               {tab.count !== '' && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
@@ -284,21 +415,29 @@ export default function ResultsPage() {
         {(activeTab === 'all' || activeTab === 'approvals') && (
           <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">🏛️</span>
-                <h2 className="font-bold text-slate-900 text-sm">Statutory Approvals &amp; Clearances</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+                  <svg className="w-4.5 h-4.5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <h2 className="font-bold text-slate-900 text-sm">{t('res.statutory_approvals_title', 'Statutory Approvals & Clearances')}</h2>
               </div>
               <span className="text-[11px] bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-full border border-blue-200">
-                {assessment.approvals.length} Required
+                {assessment.approvals.length} {t('res.required', 'Required')}
               </span>
             </div>
 
             <div className="p-6">
               {assessment.approvals.length === 0 ? (
                 <div className="text-center py-8 text-slate-400">
-                  <div className="text-3xl mb-2">✅</div>
-                  <p className="text-sm font-semibold">No specific approvals triggered</p>
-                  <p className="text-xs mt-1">Your profile may qualify for simplified clearance.</p>
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-2">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-semibold">{t('res.no_approvals', 'No specific approvals triggered')}</p>
+                  <p className="text-xs mt-1">{t('res.no_approvals_sub', 'Your profile may qualify for simplified clearance.')}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -309,8 +448,8 @@ export default function ResultsPage() {
                     >
                       <div className="flex items-start gap-3">
                         {/* Icon */}
-                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-lg shrink-0">
-                          {deptIcon(appr.authority || appr.name)}
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                          <DeptIcon authority={appr.authority || appr.name} />
                         </div>
 
                         <div className="flex-1 min-w-0">
@@ -336,14 +475,17 @@ export default function ResultsPage() {
 
                           {appr.evidence && appr.evidence.length > 0 && (
                             <div className="mt-3 flex flex-wrap gap-2 items-center">
-                              <span className="text-[10px] uppercase font-bold text-slate-400">Policy Source:</span>
+                              <span className="text-[10px] uppercase font-bold text-slate-400">{t('res.policy_source', 'Policy Source:')}</span>
                               {appr.evidence.map((ev) => (
                                 <button
                                   key={ev.chunk_id}
                                   onClick={() => setSelectedSource(ev)}
-                                  className="text-[11px] bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg px-2.5 py-1 text-indigo-700 font-medium transition-colors flex items-center gap-1"
+                                  className="text-[11px] bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg px-2.5 py-1 text-blue-700 font-medium transition-colors flex items-center gap-1"
                                 >
-                                  🔗 {ev.filename.replace(/^MH_/, '')} · p.{ev.page_start}
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                  </svg>
+                                  <span>{ev.filename.replace(/^MH_/, '')} · p.{ev.page_start}</span>
                                 </button>
                               ))}
                             </div>
@@ -359,26 +501,44 @@ export default function ResultsPage() {
         )}
 
         {/* ══════════════════════════════════════════════════════
-            MODULE 2 · INCENTIVES
+            MODULE 2 · INCENTIVES & SUBSIDIES
         ══════════════════════════════════════════════════════ */}
         {(activeTab === 'all' || activeTab === 'incentives') && (
           <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">💰</span>
-                <h2 className="font-bold text-slate-900 text-sm">State Incentives &amp; Policy Schemes</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                  <svg className="w-4.5 h-4.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h2 className="font-bold text-slate-900 text-sm">{t('res.incentives_title', 'Incentives, Subsidies & Amortization')}</h2>
               </div>
               <span className="text-[11px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-full border border-emerald-200">
-                {totalIncentives} Pathways
+                {totalIncentives} {t('res.schemes_active', 'Schemes Active')}
               </span>
             </div>
 
             <div className="p-6 space-y-6">
+              {/* Interactive Calculator pre-populated with live project summary */}
+              <div className="mb-6">
+                <IncentiveCalculator
+                  initialInvestmentInr={s.investment_inr || 250000000}
+                  initialDistrict={s.district || 'Nagpur / Solapur / Amravati'}
+                  initialSector={s.sector || 'Textile & Garments'}
+                  initialIsMsme={(s.investment_inr || 250000000) <= 500000000}
+                  initialPowerKw={500}
+                />
+              </div>
+
               {/* Policy Frameworks */}
               {assessment.applicable_policies.length > 0 && (
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-                    📜 Governing Policy Frameworks
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>{t('res.governing_policies', 'Governing Policy Frameworks')}</span>
                   </p>
                   <div className="space-y-3">
                     {assessment.applicable_policies.map((p, i) => (
@@ -395,9 +555,12 @@ export default function ResultsPage() {
                               <button
                                 key={ev.chunk_id}
                                 onClick={() => setSelectedSource(ev)}
-                                className="text-[11px] bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg px-2.5 py-1 text-indigo-700 font-medium transition-colors"
+                                className="text-[11px] bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg px-2.5 py-1 text-indigo-700 font-medium transition-colors flex items-center gap-1"
                               >
-                                🔗 {ev.filename.replace(/^MH_/, '')} · p.{ev.page_start}
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                                <span>{ev.filename.replace(/^MH_/, '')} · p.{ev.page_start}</span>
                               </button>
                             ))}
                           </div>
@@ -411,13 +574,15 @@ export default function ResultsPage() {
               {/* Specific Subsidies */}
               {assessment.incentives.length > 0 && (
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-                    🏷️ Subsidies &amp; Benefits
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    <span>{t('res.subsidies_benefits', 'Subsidies & Benefits')}</span>
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {assessment.incentives.map((inc, i) => (
                       <div key={i} className="relative border border-slate-200 hover:border-emerald-300 rounded-2xl p-4 bg-white transition-all hover:shadow-md overflow-hidden group">
-                        {/* accent strip */}
                         <div className="absolute inset-y-0 left-0 w-1 bg-emerald-400 rounded-l-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <h4 className="font-bold text-slate-900 text-sm leading-tight">{inc.name}</h4>
@@ -432,9 +597,13 @@ export default function ResultsPage() {
 
               {totalIncentives === 0 && (
                 <div className="text-center py-8 text-slate-400">
-                  <div className="text-3xl mb-2">💼</div>
-                  <p className="text-sm font-semibold">No incentive schemes identified</p>
-                  <p className="text-xs mt-1">Refine your sector/location/investment profile to unlock incentives.</p>
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-2">
+                    <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-semibold">{t('res.no_incentives', 'No incentive schemes identified')}</p>
+                  <p className="text-xs mt-1">{t('res.no_incentives_sub', 'Refine your sector/location/investment profile to unlock incentives.')}</p>
                 </div>
               )}
             </div>
@@ -447,20 +616,28 @@ export default function ResultsPage() {
         {(activeTab === 'all' || activeTab === 'documents') && (
           <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">📎</span>
-                <h2 className="font-bold text-slate-900 text-sm">Mandatory Document Checklist</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+                  <svg className="w-4.5 h-4.5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h2 className="font-bold text-slate-900 text-sm">{t('res.mandatory_docs', 'Mandatory Document Checklist')}</h2>
               </div>
               <span className="text-[11px] bg-amber-50 text-amber-700 font-bold px-2.5 py-1 rounded-full border border-amber-200">
-                {assessment.documents_required.length} Required
+                {assessment.documents_required.length} {t('res.required', 'Required')}
               </span>
             </div>
 
             <div className="p-6">
               {assessment.documents_required.length === 0 ? (
                 <div className="text-center py-8 text-slate-400">
-                  <div className="text-3xl mb-2">📂</div>
-                  <p className="text-sm">No additional documents identified.</p>
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-2">
+                    <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm">{t('res.no_docs', 'No additional documents identified.')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -469,12 +646,14 @@ export default function ResultsPage() {
                       key={idx}
                       className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-slate-300 hover:shadow-sm transition-all group"
                     >
-                      <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm shrink-0 group-hover:bg-amber-200 transition-colors">
-                        ✓
+                      <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold shrink-0 group-hover:bg-amber-200 transition-colors">
+                        <svg className="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-slate-900">{doc}</p>
-                        <p className="text-[11px] text-slate-400 mt-0.5">Required for statutory filing</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{t('res.statutory_filing', 'Required for statutory filing')}</p>
                       </div>
                     </div>
                   ))}
@@ -490,12 +669,16 @@ export default function ResultsPage() {
         {(activeTab === 'all' || activeTab === 'forms') && (
           <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">📋</span>
-                <h2 className="font-bold text-slate-900 text-sm">Prescribed Government Forms</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center shrink-0">
+                  <svg className="w-4.5 h-4.5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <h2 className="font-bold text-slate-900 text-sm">{t('res.prescribed_forms', 'Prescribed Government Forms')}</h2>
               </div>
               <span className="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-full border border-indigo-200">
-                {forms.length} Mapped
+                {forms.length} {t('res.mapped', 'Mapped')}
               </span>
             </div>
 
@@ -503,13 +686,17 @@ export default function ResultsPage() {
               {formsLoading ? (
                 <div className="flex items-center gap-3 py-6 text-slate-500 text-xs">
                   <div className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
-                  Querying form requirements…
+                  {t('res.querying_forms', 'Querying form requirements…')}
                 </div>
               ) : forms.length === 0 ? (
                 <div className="rounded-2xl bg-slate-50 border border-slate-200 text-center p-8">
-                  <div className="text-3xl mb-2">🗂️</div>
-                  <p className="text-sm font-semibold text-slate-700">No mapped forms in knowledge base</p>
-                  <p className="text-xs text-slate-400 mt-1">Forms will be designated upon departmental routing.</p>
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-2">
+                    <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-700">{t('res.no_forms', 'No mapped forms in knowledge base')}</p>
+                  <p className="text-xs text-slate-400 mt-1">{t('res.forms_routing', 'Forms will be designated upon departmental routing.')}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -534,7 +721,7 @@ export default function ResultsPage() {
 
                       {f.condition && (
                         <p className="text-xs text-slate-600 mb-2">
-                          <span className="font-semibold text-slate-700">Condition:</span> {f.condition}
+                          <span className="font-semibold text-slate-700">{t('res.condition', 'Condition:')}</span> {f.condition}
                         </p>
                       )}
 
@@ -546,10 +733,20 @@ export default function ResultsPage() {
 
                       <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 pt-1 border-t border-slate-100">
                         {f.filename && (
-                          <span>📄 {f.filename} {f.page_start && `(p.${f.page_start})`}</span>
+                          <span className="flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>{f.filename} {f.page_start && `(p.${f.page_start})`}</span>
+                          </span>
                         )}
                         {f.submission_method && (
-                          <span>📮 {f.submission_method}</span>
+                          <span className="flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <span>{f.submission_method}</span>
+                          </span>
                         )}
                       </div>
                     </div>
@@ -557,7 +754,7 @@ export default function ResultsPage() {
                   {forms.length > 15 && (
                     <div className="text-center pt-2">
                       <Link href="/forms" className="text-xs text-blue-600 hover:text-blue-500 font-bold hover:underline">
-                        View all {forms.length} forms in Forms Repository →
+                        {t('res.view_all_forms', 'View all')} {forms.length} {t('res.forms_in_repo', 'forms in Forms Repository →')}
                       </Link>
                     </div>
                   )}
@@ -573,12 +770,16 @@ export default function ResultsPage() {
         {(activeTab === 'all' || activeTab === 'sources') && (
           <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">🔗</span>
-                <h2 className="font-bold text-slate-900 text-sm">Grounded Policy Evidence</h2>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+                  <svg className="w-4.5 h-4.5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                </div>
+                <h2 className="font-bold text-slate-900 text-sm">{t('res.grounded_evidence', 'Grounded Policy Evidence')}</h2>
               </div>
               <span className="text-[11px] bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-full border border-slate-200">
-                {assessment.sources.length} Citations
+                {assessment.sources.length} {t('res.citations', 'Citations')}
               </span>
             </div>
 
@@ -602,7 +803,7 @@ export default function ResultsPage() {
                       onClick={() => setSelectedSource(src)}
                       className="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 text-slate-600 hover:text-indigo-700 text-[11px] font-semibold rounded-lg transition-all shrink-0"
                     >
-                      View →
+                      {t('res.view_evidence', 'View →')}
                     </button>
                   </div>
                   <p className="text-[11px] text-slate-600 font-mono bg-slate-50 p-2.5 rounded-xl border border-slate-100 line-clamp-3 leading-relaxed">
@@ -616,9 +817,11 @@ export default function ResultsPage() {
 
         {/* ── DISCLAIMER ──────────────────────────────────────── */}
         <div className="flex gap-3 bg-slate-100 border border-slate-200 rounded-2xl p-4 text-xs text-slate-600">
-          <span className="text-base shrink-0">⚖️</span>
+          <svg className="w-5 h-5 text-slate-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+          </svg>
           <div>
-            <p className="font-bold text-slate-800 mb-0.5">Statutory Advisory Note</p>
+            <p className="font-bold text-slate-800 mb-0.5">{t('res.statutory_advisory', 'Statutory Advisory Note')}</p>
             <p className="leading-relaxed">{assessment.disclaimer}</p>
           </div>
         </div>

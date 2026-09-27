@@ -124,7 +124,10 @@ function WizardInner() {
     if (step === 1 || validateAll) {
       if (!profile.entity_type) errs.entity_type = 'Entity type is required.';
       if (!profile.entity_name?.trim()) errs.entity_name = 'Entity name is required.';
-      if (profile.pan && profile.pan.length !== 10) errs.pan = 'PAN must be exactly 10 characters.';
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+      if (profile.pan && !panRegex.test(profile.pan)) {
+        errs.pan = 'PAN must be valid (5 letters, 4 digits, 1 letter, e.g. AABCT1234E).';
+      }
     }
     if (step === 2 || validateAll) {
       if (!profile.sector) errs.sector = 'Sector is required.';
@@ -218,14 +221,28 @@ function WizardInner() {
         </div>
 
         <div className="mb-5">
-          <Label>PAN (optional)</Label>
+          <div className="flex items-center justify-between">
+            <Label>PAN (optional)</Label>
+            {profile.pan && (
+              <span className={`text-[10px] font-mono font-semibold ${profile.pan.length === 10 && /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(profile.pan) ? 'text-emerald-600' : 'text-slate-400'}`}>
+                {profile.pan.length}/10 {profile.pan.length === 10 && /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(profile.pan) ? '✓ Valid' : 'Format: AAAAA9999A'}
+              </span>
+            )}
+          </div>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full border rounded-lg px-3 py-2 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 ${
+              errors.pan ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-500'
+            }`}
             placeholder="e.g. AABCT1234E"
             value={profile.pan ?? ''}
-            onChange={(e) => set('pan', e.target.value)}
+            maxLength={10}
+            onChange={(e) => {
+              const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+              set('pan', val);
+            }}
           />
+          <FieldError msg={errors.pan} />
         </div>
 
         <div className="mb-5">

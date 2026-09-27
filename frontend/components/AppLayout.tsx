@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import AiSupportWidget from '@/components/AiSupportWidget';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface User {
   username: string;
@@ -11,15 +13,15 @@ interface User {
 }
 
 const NAV_LINKS = [
-  { href: '/', label: 'Dashboard', icon: 'Dashboard' },
-  { href: '/assess', label: 'Project Assessment', icon: 'Assessment', badge: 'Core' },
-  { href: '/results', label: 'Assessment Results', icon: 'Results' },
-  { href: '/approvals', label: 'Approvals & Compliance', icon: 'Approvals' },
-  { href: '/incentives', label: 'Incentives & Schemes', icon: 'Incentives' },
-  { href: '/documents', label: 'Documents', icon: 'Documents' },
-  { href: '/forms', label: 'Forms Repository', icon: 'Forms', badge: '186' },
-  { href: '/applications', label: 'Applications', icon: 'Applications' },
-  { href: '/knowledge', label: 'Govt. Knowledge', icon: 'Knowledge', badge: '478' },
+  { href: '/', key: 'nav.dashboard', defaultLabel: 'Dashboard', icon: 'Dashboard' },
+  { href: '/assess', key: 'nav.assess', defaultLabel: 'Project Assessment', icon: 'Assessment', badge: 'Core' },
+  { href: '/results', key: 'nav.results', defaultLabel: 'Assessment Results', icon: 'Results' },
+  { href: '/approvals', key: 'nav.approvals', defaultLabel: 'Approvals & Compliance', icon: 'Approvals' },
+  { href: '/incentives', key: 'nav.incentives', defaultLabel: 'Incentives & Schemes', icon: 'Incentives' },
+  { href: '/documents', key: 'nav.documents', defaultLabel: 'Documents', icon: 'Documents' },
+  { href: '/forms', key: 'nav.forms', defaultLabel: 'Forms Repository', icon: 'Forms', badge: '186' },
+  { href: '/applications', key: 'nav.applications', defaultLabel: 'Applications', icon: 'Applications' },
+  { href: '/knowledge', key: 'nav.knowledge', defaultLabel: 'Govt. Knowledge', icon: 'Knowledge', badge: '478' },
 ];
 
 function NavIcon({ name }: { name: string }) {
@@ -86,10 +88,12 @@ function NavIcon({ name }: { name: string }) {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { lang, setLang, t } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [hasAssessment, setHasAssessment] = useState(false);
+  const [fontSize, setFontSize] = useState<'small' | 'normal' | 'large'>('normal');
 
   useEffect(() => {
     const raw = localStorage.getItem('smsws_user');
@@ -111,7 +115,34 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (savedCollapsed === '1') {
       setSidebarCollapsed(true);
     }
+
+    // Ensure default size is strictly 'normal' (button A)
+    const savedFontSize = localStorage.getItem('smsws_font_size_v2');
+    if (savedFontSize === 'small' || savedFontSize === 'normal' || savedFontSize === 'large') {
+      setFontSize(savedFontSize as 'small' | 'normal' | 'large');
+      if (typeof document !== 'undefined') {
+        if (savedFontSize === 'small') document.documentElement.style.fontSize = '100%';
+        else if (savedFontSize === 'normal') document.documentElement.style.fontSize = '112.5%';
+        else if (savedFontSize === 'large') document.documentElement.style.fontSize = '125%';
+      }
+    } else {
+      setFontSize('normal');
+      localStorage.setItem('smsws_font_size_v2', 'normal');
+      if (typeof document !== 'undefined') {
+        document.documentElement.style.fontSize = '112.5%';
+      }
+    }
   }, [pathname, router]);
+
+  function changeFontSize(size: 'small' | 'normal' | 'large') {
+    setFontSize(size);
+    localStorage.setItem('smsws_font_size_v2', size);
+    if (typeof document !== 'undefined') {
+      if (size === 'small') document.documentElement.style.fontSize = '100%';
+      else if (size === 'normal') document.documentElement.style.fontSize = '112.5%';
+      else if (size === 'large') document.documentElement.style.fontSize = '125%';
+    }
+  }
 
   function toggleSidebarCollapse() {
     const nextState = !sidebarCollapsed;
@@ -127,9 +158,97 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-100/80 flex flex-col antialiased text-slate-900 selection:bg-blue-100 selection:text-blue-900">
       
+      {/* Functional Official Government Utility Top Bar */}
+      <div className="w-full bg-slate-950 text-slate-300 border-b border-slate-800 text-[11px] px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-3 font-medium z-50">
+        <div className="flex items-center gap-3">
+          {/* Language Switcher */}
+          <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-700/80 rounded-xl p-1 shadow-inner">
+            <svg className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+            </svg>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`px-3 py-1 rounded-lg text-xs font-black tracking-wide transition-all ${
+                lang === 'en' ? 'bg-blue-600 text-white shadow-md ring-1 ring-blue-400' : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              ENGLISH
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('mr')}
+              className={`px-3 py-1 rounded-lg text-xs font-black tracking-wide transition-all ${
+                lang === 'mr' ? 'bg-amber-600 text-white shadow-md ring-1 ring-amber-400' : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              मराठी
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('hi')}
+              className={`px-3 py-1 rounded-lg text-xs font-black tracking-wide transition-all ${
+                lang === 'hi' ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-400' : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              हिंदी
+            </button>
+          </div>
+          <span className="text-slate-700 hidden sm:inline">|</span>
+          <span className="text-slate-300 hidden sm:inline font-semibold">
+            {t('portal.subtitle', 'Government of Maharashtra — Official Industrial Single Window Portal')}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-4 text-xs">
+          {/* Font Sizer Controls */}
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <span className="hidden md:inline text-slate-400 font-semibold">{t('text.size', 'Text Size:')}</span>
+            <div className="flex items-center gap-1 bg-slate-900 border border-slate-700/80 rounded-xl p-1">
+              <button
+                type="button"
+                onClick={() => changeFontSize('small')}
+                title="Small Font Size (A-)"
+                className={`px-2 py-0.5 rounded font-mono font-bold text-xs transition-colors ${
+                  fontSize === 'small' ? 'bg-slate-700 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                A-
+              </button>
+              <button
+                type="button"
+                onClick={() => changeFontSize('normal')}
+                title="Standard Font Size (A)"
+                className={`px-2.5 py-0.5 rounded font-mono font-bold text-xs transition-colors ${
+                  fontSize === 'normal' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                A
+              </button>
+              <button
+                type="button"
+                onClick={() => changeFontSize('large')}
+                title="Enlarged Font Size (A+)"
+                className={`px-2 py-0.5 rounded font-mono font-bold text-xs transition-colors ${
+                  fontSize === 'large' ? 'bg-amber-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                A+
+              </button>
+            </div>
+          </div>
+
+          <span className="text-slate-700">|</span>
+          <span className="text-emerald-400 font-bold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            {t('maitri.gateway', 'MAITRI Gateway Active')}
+          </span>
+        </div>
+      </div>
+
       {/* Top Header */}
       <header className="w-full bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
-        <div className="max-w-[1700px] w-full mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           
           {/* Brand & Desktop Collapse Toggle */}
           <div className="flex items-center gap-3">
@@ -172,14 +291,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <div className="flex flex-col justify-center">
                 <div className="flex items-center gap-2">
                   <span className="text-sm sm:text-base uppercase font-extrabold tracking-wider text-slate-300">
-                    Government of Maharashtra
+                    {t('gov.name', 'Government of Maharashtra')}
                   </span>
                   <span className="hidden sm:inline-block text-[10px] font-mono bg-slate-800 text-amber-300 px-2 py-0.5 rounded border border-slate-700">
-                    MAITRI Single Window
+                    {t('maitri.single_window', 'MAITRI Single Window')}
                   </span>
                 </div>
                 <span className="text-white font-black text-lg sm:text-xl tracking-tight leading-none group-hover:text-slate-100 transition-colors">
-                  Unified Industrial Approval System
+                  {t('portal.name', 'Unified Industrial Approval System')}
                 </span>
               </div>
             </Link>
@@ -192,7 +311,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               href="/assess?demo=textile"
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors shadow-xs"
             >
-              <span>Try Demo Project</span>
+              <span>{t('try.demo', 'Try Demo Project')}</span>
             </Link>
 
             {/* Assessment Indicator */}
@@ -202,7 +321,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-xs font-semibold hover:text-white transition-colors"
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span>Active Report</span>
+                <span>{t('active.report', 'Active Report')}</span>
               </Link>
             )}
 
@@ -221,7 +340,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 className="ml-1 text-xs text-slate-400 hover:text-rose-300 px-2.5 py-1.5 rounded-lg hover:bg-slate-800 transition-colors font-medium"
                 title="Sign out of portal"
               >
-                Sign out
+                {t('nav.signout', 'Sign out')}
               </button>
             </div>
           </div>
@@ -229,18 +348,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      {/* Main Container with Full Fluid Width max-w-[1700px] */}
-      <div className="flex-1 flex max-w-[1700px] w-full mx-auto my-4 px-3 sm:px-6 lg:px-8 gap-6">
+      {/* Main Container with Full Fluid Width */}
+      <div className="flex-1 flex w-full mx-auto my-4 px-3 sm:px-6 lg:px-8 gap-6">
         
         {/* Sidebar Container Wrapper - Sticky + Hover Expansion Overlay */}
-        <div className={`relative shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} z-20 hover:z-40`}>
+        <div className={`relative shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-72'} z-20 hover:z-40`}>
           <aside
             className={`sticky top-20 h-[calc(100vh-6rem)] bg-slate-900 text-slate-300 border border-slate-800 p-4 rounded-2xl transition-all duration-300 ease-in-out shadow-xl flex flex-col justify-between overflow-x-hidden overflow-y-auto group ${
               sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
             } ${
               sidebarCollapsed
-                ? 'w-16 px-2 hover:w-64 hover:px-4 hover:shadow-2xl hover:z-40 hover:bg-slate-900'
-                : 'w-64 px-4'
+                ? 'w-16 px-2 hover:w-72 hover:px-4 hover:shadow-2xl hover:z-40 hover:bg-slate-900'
+                : 'w-72 px-4'
             }`}
           >
             <div>
@@ -248,7 +367,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <div className={`text-xs font-bold text-slate-400 uppercase tracking-widest px-2 mb-2 whitespace-nowrap ${
                 sidebarCollapsed ? 'hidden group-hover:block' : 'block'
               }`}>
-                Navigation
+                {t('nav.navigation', 'Navigation')}
               </div>
 
               <nav className="space-y-1.5">
@@ -259,27 +378,31 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       key={item.href}
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
+                      className={`flex items-center rounded-xl text-sm font-semibold transition-all ${
                         sidebarCollapsed
-                          ? 'justify-center px-2 py-3 group-hover:justify-between group-hover:px-3.5 group-hover:py-2.5'
-                          : 'justify-between px-3.5 py-2.5'
+                          ? 'w-10 h-10 mx-auto justify-center group-hover:w-full group-hover:h-auto group-hover:justify-between group-hover:px-3 group-hover:py-2.5'
+                          : 'justify-between px-3 py-2.5 gap-2.5'
                       } ${
                         isActive
                           ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-900/30'
                           : 'text-slate-300 hover:text-white hover:bg-slate-800'
                       }`}
                     >
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className={isActive ? 'text-white' : 'text-slate-400'}>
+                      <div className={`flex items-center ${
+                        sidebarCollapsed
+                          ? 'justify-center group-hover:justify-start group-hover:gap-2.5 min-w-0 group-hover:flex-1'
+                          : 'gap-2.5 min-w-0 flex-1 mr-1.5'
+                      }`}>
+                        <span className={`${isActive ? 'text-white' : 'text-slate-400'} shrink-0 flex items-center justify-center`}>
                           <NavIcon name={item.icon} />
                         </span>
-                        <span className={`text-sm leading-none ${sidebarCollapsed ? 'hidden group-hover:inline' : 'inline'}`}>
-                          {item.label}
+                        <span className={`text-sm leading-tight truncate ${sidebarCollapsed ? 'hidden group-hover:inline' : 'inline'}`}>
+                          {t(item.key, item.defaultLabel)}
                         </span>
                       </div>
                       {item.badge && (
                         <span
-                          className={`text-xs px-2 py-0.5 rounded-md font-bold shrink-0 ${
+                          className={`text-[11px] px-2 py-0.5 rounded-md font-bold shrink-0 ml-1.5 whitespace-nowrap ${
                             sidebarCollapsed ? 'hidden group-hover:inline-block' : 'inline-block'
                           } ${
                             isActive
@@ -287,7 +410,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                               : 'bg-slate-800 text-slate-400 border border-slate-700'
                           }`}
                         >
-                          {item.badge}
+                          {item.badge === 'Core' ? t('badge.core', 'Core') : item.badge}
                         </span>
                       )}
                     </Link>
@@ -297,18 +420,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div>
-              {/* Demo Launcher - Moved to bottom so nav item position never shifts */}
+              {/* Demo Launcher */}
               <div className={`mt-4 p-3.5 rounded-xl bg-slate-800/90 border border-slate-700/80 whitespace-nowrap transition-opacity duration-200 ${
                 sidebarCollapsed ? 'opacity-0 group-hover:opacity-100 hidden group-hover:block' : 'opacity-100 block'
               }`}>
-                <p className="text-xs uppercase font-bold text-amber-400 tracking-wider">Fast Demonstration</p>
-                <p className="text-xs text-slate-300 mt-0.5 leading-normal">Evaluate clearances &amp; subsidies.</p>
+                <p className="text-xs uppercase font-bold text-amber-400 tracking-wider">{t('fast.demo', 'Fast Demonstration')}</p>
+                <p className="text-xs text-slate-300 mt-0.5 leading-normal">{t('demo.desc', 'Evaluate clearances & subsidies.')}</p>
                 <Link
                   href="/assess?demo=textile"
                   onClick={() => setSidebarOpen(false)}
                   className="mt-2.5 w-full flex items-center justify-center gap-1.5 py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-colors shadow-xs"
                 >
-                  <span>Launch Demo</span>
+                  <span>{t('launch.demo', 'Launch Demo')}</span>
                 </Link>
               </div>
 
@@ -316,13 +439,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 sidebarCollapsed ? 'hidden group-hover:block' : 'block'
               }`}>
                 <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-                  <span>Corpus</span>
-                  <span className="font-mono text-amber-400 font-bold">Grounded</span>
+                  <span>{t('kb.corpus', 'Corpus')}</span>
+                  <span className="font-mono text-amber-400 font-bold">{t('corpus.grounded', 'Grounded')}</span>
                 </div>
                 <div className="mt-1 space-y-0.5 text-xs text-slate-400">
-                  <p>• 478 Documents</p>
-                  <p>• 1,279 Rules</p>
-                  <p>• 186 Forms</p>
+                  <p>• 478 {t('res.documents_tab', 'Documents')}</p>
+                  <p>• 1,279 {t('kb.rules', 'Rules')}</p>
+                  <p>• 186 {t('res.forms_tab', 'Forms')}</p>
                 </div>
               </div>
             </div>
@@ -338,18 +461,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Content Area */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 outline-none focus:ring-2 focus:ring-blue-500/30 rounded-2xl transition-all"
+        >
           {children}
         </main>
       </div>
 
       {/* Clean Footer */}
       <footer className="w-full bg-white border-t border-slate-200 mt-auto py-3.5 px-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© 2026 Unified Industrial Approval System · Directorate of Industries, Govt. of Maharashtra</p>
-          <p className="text-slate-400">Deterministic Rule Engine · Grounded in Verified State Gazettes & MAITRI Rules</p>
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p>{t('footer.copyright', '© 2026 Unified Industrial Approval System · Directorate of Industries, Govt. of Maharashtra')}</p>
+          <p className="text-slate-400">{t('footer.rule_engine', 'Deterministic Rule Engine · Grounded in Verified State Gazettes & MAITRI Rules')}</p>
         </div>
       </footer>
+
+      {/* Floating AI Support & Live Agent Widget */}
+      <AiSupportWidget />
     </div>
   );
 }

@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/context/LanguageContext';
 
 const VALID_USERS = [
   { username: 'sih130', password: 'uias130@', name: 'Industrial Officer', role: 'Enterprise Administrator' },
 ];
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -59,20 +61,20 @@ export default function LoginPage() {
               className="w-full h-full object-contain drop-shadow-md"
             />
           </div>
-          <p className="text-slate-700 text-base tracking-wider uppercase font-extrabold">Government of Maharashtra</p>
-          <h1 className="text-slate-900 font-black text-2xl tracking-tight mt-1">Unified Industrial Approval System</h1>
-          <p className="text-slate-500 text-sm mt-1 font-medium">Single Window Clearance & Regulatory Portal</p>
+          <p className="text-slate-700 text-base tracking-wider uppercase font-extrabold">{t('gov.name', 'Government of Maharashtra')}</p>
+          <h1 className="text-slate-900 font-black text-2xl tracking-tight mt-1">{t('portal.name', 'Unified Industrial Approval System')}</h1>
+          <p className="text-slate-500 text-sm mt-1 font-medium">{t('portal.subtitle', 'Single Window Clearance & Regulatory Portal')}</p>
         </div>
 
         {/* Login Card - Soft comfortable slate & subtle border */}
         <div className="bg-white rounded-2xl p-7 border border-slate-200/90 shadow-sm">
-          <h2 className="text-slate-800 font-semibold text-sm mb-1">Sign In</h2>
-          <p className="text-slate-500 text-xs mb-5">Enter authorized single-window credentials</p>
+          <h2 className="text-slate-800 font-semibold text-sm mb-1">{t('login.signin', 'Sign In')}</h2>
+          <p className="text-slate-500 text-xs mb-5">{t('login.sub', 'Enter authorized single-window credentials')}</p>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
-                Username
+                {t('login.username', 'Username')}
               </label>
               <input
                 type="text"
@@ -87,7 +89,7 @@ export default function LoginPage() {
 
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
-                Password
+                {t('login.password', 'Password')}
               </label>
               <div className="relative">
                 <input
@@ -104,7 +106,7 @@ export default function LoginPage() {
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[11px] font-medium"
                   tabIndex={-1}
                 >
-                  {showPass ? 'Hide' : 'Show'}
+                  {showPass ? t('login.hide', 'Hide') : t('login.show', 'Show')}
                 </button>
               </div>
             </div>
@@ -120,7 +122,7 @@ export default function LoginPage() {
               disabled={loading || !username || !password}
               className="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium text-xs transition-colors shadow-xs"
             >
-              {loading ? 'Authenticating…' : 'Access Portal →'}
+              {loading ? t('login.authenticating', 'Authenticating…') : t('login.access', 'Access Portal →')}
             </button>
           </form>
 
@@ -132,7 +134,7 @@ export default function LoginPage() {
               onClick={quickFill}
               className="text-blue-600 hover:text-blue-700 text-xs font-medium underline underline-offset-2"
             >
-              Auto-fill Credentials
+              {t('login.autofill', 'Auto-fill Credentials')}
             </button>
           </div>
         </div>

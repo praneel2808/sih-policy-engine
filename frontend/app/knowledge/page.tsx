@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AppLayout from '@/components/AppLayout';
 import { getDocuments, getDbHealth } from '@/lib/api';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function KnowledgePage() {
+  const { t } = useLanguage();
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -52,15 +54,15 @@ export default function KnowledgePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-              <Link href="/" className="hover:text-blue-600">Dashboard</Link>
+              <Link href="/" className="hover:text-blue-600">{t('nav.dashboard', 'Dashboard')}</Link>
               <span>/</span>
-              <span className="text-slate-800 font-semibold">Government Knowledge Base</span>
+              <span className="text-slate-800 font-semibold">{t('nav.knowledge', 'Government Knowledge Base')}</span>
             </div>
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              Maharashtra Industrial Policy & Statutory Corpus
+              {t('kb.title', 'Maharashtra Industrial Policy & Statutory Corpus')}
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Authoritative knowledge repository comprising 478 official government gazettes, acts, GRs, and rules.
+              {t('kb.subtitle', 'Authoritative knowledge repository comprising 478 official government gazettes, acts, GRs, and rules.')}
             </p>
           </div>
 
@@ -68,31 +70,31 @@ export default function KnowledgePage() {
             href="/assess"
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-colors shadow-xs shrink-0"
           >
-            Run Rules Assessment →
+            {t('kb.assess_btn', 'Run Rules Assessment →')}
           </Link>
         </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Document Corpus</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">{t('kb.corpus', 'Document Corpus')}</span>
             <p className="text-2xl font-black text-slate-900 mt-1">{stats.documents}</p>
-            <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">100% Extracted & Normalized</p>
+            <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">{t('kb.extracted_normalized', '100% Extracted & Normalized')}</p>
           </div>
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Canonical Rules</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">{t('kb.rules', 'Canonical Rules')}</span>
             <p className="text-2xl font-black text-blue-700 mt-1">{stats.canonical_rules.toLocaleString()}</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Deterministic evaluation</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">{t('kb.deterministic_eval', 'Deterministic evaluation')}</p>
           </div>
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Extracted Forms</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">{t('kb.forms', 'Extracted Forms')}</span>
             <p className="text-2xl font-black text-purple-700 mt-1">{stats.form_requirements}</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Prescribed statutory forms</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">{t('kb.prescribed_statutory', 'Prescribed statutory forms')}</p>
           </div>
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Source Chunks</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">{t('kb.chunks', 'Source Chunks')}</span>
             <p className="text-2xl font-black text-amber-700 mt-1">{stats.chunks.toLocaleString()}</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Verbatim page references</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">{t('kb.verbatim_refs', 'Verbatim page references')}</p>
           </div>
         </div>
 
@@ -101,7 +103,7 @@ export default function KnowledgePage() {
           <span className="text-slate-400">🔍</span>
           <input
             type="text"
-            placeholder="Search gazette documents by filename, department, or keyword…"
+            placeholder={t('kb.search_ph', 'Search gazette documents by filename, department, or keyword…')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full border-none text-xs focus:outline-none bg-transparent"
@@ -112,9 +114,9 @@ export default function KnowledgePage() {
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="bg-slate-50 border-b border-slate-200 px-6 py-3.5 flex items-center justify-between">
             <h2 className="font-extrabold text-slate-900 text-sm">
-              Official Document Inventory ({filteredDocs.length} shown)
+              {t('kb.inventory_title', 'Official Document Inventory')} ({filteredDocs.length} shown)
             </h2>
-            <span className="text-xs text-slate-400 font-mono">Status: ALL EXTRACTED</span>
+            <span className="text-xs text-slate-400 font-mono">{t('kb.all_extracted', 'Status: ALL EXTRACTED')}</span>
           </div>
 
           <div className="p-6">
@@ -124,10 +126,10 @@ export default function KnowledgePage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
-                <span>Loading document inventory from database…</span>
+                <span>{t('kb.loading', 'Loading document inventory from database…')}</span>
               </div>
             ) : filteredDocs.length === 0 ? (
-              <p className="text-xs text-slate-400 italic text-center py-6">No matching documents found.</p>
+              <p className="text-xs text-slate-400 italic text-center py-6">{t('kb.no_matching', 'No matching documents found.')}</p>
             ) : (
               <div className="divide-y divide-slate-100">
                 {filteredDocs.map((doc) => (
@@ -140,10 +142,10 @@ export default function KnowledgePage() {
                         </p>
                       </div>
                       <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-1 pl-6">
-                        <span>Doc ID: <span className="font-mono text-slate-600">{doc.document_id}</span></span>
-                        <span>Pages: <strong className="text-slate-700">{doc.page_count || 1}</strong></span>
+                        <span>{t('kb.doc_id', 'Doc ID:')} <span className="font-mono text-slate-600">{doc.document_id}</span></span>
+                        <span>{t('kb.pages', 'Pages:')} <strong className="text-slate-700">{doc.page_count || 1}</strong></span>
                         {doc.language_detected && (
-                          <span>Lang: <strong className="text-slate-700 uppercase">{doc.language_detected}</strong></span>
+                          <span>{t('kb.lang', 'Lang:')} <strong className="text-slate-700 uppercase">{doc.language_detected}</strong></span>
                         )}
                       </div>
                     </div>
@@ -159,7 +161,7 @@ export default function KnowledgePage() {
                           rel="noopener noreferrer"
                           className="px-2.5 py-1 text-xs text-blue-600 hover:bg-blue-50 border border-blue-200 rounded-lg transition-colors font-semibold"
                         >
-                          Source URL ↗
+                          {t('kb.source_url', 'Source URL ↗')}
                         </a>
                       )}
                     </div>
