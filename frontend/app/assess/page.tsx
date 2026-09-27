@@ -717,14 +717,14 @@ function AssessInner() {
         <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs">
           <div className="flex items-center justify-between mb-3.5">
             <div>
-              <p className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+              <div className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
                   <svg className="w-3.5 h-3.5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 19L8.5 5h7L20 19M4 19h16M12 7v2m0 3v2m0 3v2" />
                   </svg>
                 </div>
                 <span>{t('dash.highway_title', 'Maharashtra Industrial Clearance Highway')}</span>
-              </p>
+              </div>
               <p className="text-[11px] text-slate-500 mt-0.5">{t('highway.filter_sub', 'Click any stage to filter statutory sequencing:')}</p>
             </div>
             <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold">
