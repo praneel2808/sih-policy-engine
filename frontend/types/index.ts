@@ -112,6 +112,19 @@ export interface AssessmentResponse {
   disclaimer: string;
 }
 
+export interface FormField {
+  form_field_id: number;
+  form_requirement_id: number;
+  field_order: number;
+  field_name: string;
+  official_field_label: string;
+  input_type: string;
+  required: number;
+  options?: string;
+  condition?: string;
+  validation?: string;
+}
+
 export interface FormRequirement {
   form_requirement_id: number;
   canonical_rule_id?: string;
@@ -134,6 +147,7 @@ export interface FormRequirement {
   source_url?: string;
   rule_name?: string;
   policy_sector?: string;
+  fields?: FormField[];
 }
 
 // ── Demo profiles ─────────────────────────────────────────────────────────────

@@ -164,6 +164,8 @@ function TabIcon({ id, className = "w-4 h-4 shrink-0" }: { id: Tab; className?: 
   }
 }
 
+import FormFillerModal from '@/components/FormFillerModal';
+
 /* ─── MAIN PAGE ───────────────────────────────────────────── */
 export default function ResultsPage() {
   const { t } = useLanguage();
@@ -175,6 +177,8 @@ export default function ResultsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('all');
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [printQrUrl, setPrintQrUrl] = useState('');
+  const [formFillerOpen, setFormFillerOpen] = useState(false);
+  const [selectedFormsToFill, setSelectedFormsToFill] = useState<FormRequirement[]>([]);
 
   useEffect(() => {
     const raw = localStorage.getItem('smsws_assessment');
@@ -735,9 +739,24 @@ export default function ResultsPage() {
               </div>
               <h2 className="font-bold text-slate-900 text-sm">{t('res.prescribed_forms', 'Prescribed Government Forms')}</h2>
             </div>
-            <span className="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-full border border-indigo-200">
-              {forms.length} {t('res.mapped', 'Mapped')}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-full border border-indigo-200">
+                {forms.length} {t('res.mapped', 'Mapped')}
+              </span>
+              {forms.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFormsToFill(forms);
+                    setFormFillerOpen(true);
+                  }}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center gap-1.5 print:hidden"
+                >
+                  <span>📝</span>
+                  <span>Fill All Mapped Forms</span>
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="p-6">
@@ -768,6 +787,17 @@ export default function ResultsPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFormsToFill([f]);
+                            setFormFillerOpen(true);
+                          }}
+                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[11px] rounded-lg border border-indigo-200 transition-colors flex items-center gap-1 print:hidden"
+                        >
+                          <span>✍️</span>
+                          <span>Fill Form</span>
+                        </button>
                         <FormTypeBadge type={f.form_type} />
                         {f.required && (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-amber-50 text-amber-700 border-amber-200">
@@ -789,21 +819,28 @@ export default function ResultsPage() {
                       </p>
                     )}
 
-                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 pt-1 border-t border-slate-100">
-                      {f.filename && (
-                        <span className="flex items-center gap-1">
-                          <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          <span>{f.filename} {f.page_start && `(p.${f.page_start})`}</span>
-                        </span>
-                      )}
-                      {f.submission_method && (
-                        <span className="flex items-center gap-1">
-                          <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          </svg>
-                          <span>{f.submission_method}</span>
+                    <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-400 pt-1 border-t border-slate-100">
+                      <div className="flex items-center gap-3">
+                        {f.filename && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>{f.filename} {f.page_start && `(p.${f.page_start})`}</span>
+                          </span>
+                        )}
+                        {f.submission_method && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <span>{f.submission_method}</span>
+                          </span>
+                        )}
+                      </div>
+                      {f.fields && f.fields.length > 0 && (
+                        <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 text-[10px]">
+                          {f.fields.length} Configured Field{f.fields.length === 1 ? '' : 's'}
                         </span>
                       )}
                     </div>
@@ -890,6 +927,12 @@ export default function ResultsPage() {
         projectSummary={s}
         clearanceCount={assessment.approvals.length}
         incentiveCount={totalIncentives}
+      />
+      <FormFillerModal
+        isOpen={formFillerOpen}
+        onClose={() => setFormFillerOpen(false)}
+        forms={selectedFormsToFill}
+        projectName={s.entity_name}
       />
     </AppLayout>
   );

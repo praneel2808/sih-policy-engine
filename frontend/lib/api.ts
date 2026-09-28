@@ -55,10 +55,35 @@ export async function getSource(chunkId: string): Promise<SourceEvidence> {
 }
 
 export async function getForms(sector?: string): Promise<FormRequirement[]> {
-  const params = new URLSearchParams({ limit: "200" });
+  const params = new URLSearchParams({ limit: "200", deduplicate: "true" });
   if (sector) params.set("sector", sector);
   const res = await fetch(`${API_BASE}/api/forms?${params.toString()}`);
   if (!res.ok) throw new Error("Could not load form requirements");
+  return res.json();
+}
+
+export async function getFormFields(formRequirementId: number): Promise<any[]> {
+  const res = await fetch(`${API_BASE}/api/forms/${formRequirementId}/fields`);
+  if (!res.ok) throw new Error("Could not load form fields");
+  return res.json();
+}
+
+export async function submitFormSubmissions(payload: {
+  project_id?: string;
+  entity_name?: string;
+  submissions: Array<{
+    form_requirement_id: number;
+    form_name?: string;
+    form_number?: string;
+    collected_values: Record<string, any>;
+  }>;
+}): Promise<any> {
+  const res = await fetch(`${API_BASE}/api/form-submissions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to save form submissions");
   return res.json();
 }
 

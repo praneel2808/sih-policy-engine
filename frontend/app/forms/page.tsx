@@ -109,6 +109,8 @@ function getFormBrief(form: FormRequirement, lang: string): string | null {
   return null;
 }
 
+import FormFillerModal from '@/components/FormFillerModal';
+
 export default function FormsPage() {
   const { t, lang } = useLanguage();
   const [forms, setForms] = useState<FormRequirement[]>([]);
@@ -116,6 +118,8 @@ export default function FormsPage() {
   const [sectorFilter, setSectorFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
+  const [fillerOpen, setFillerOpen] = useState(false);
+  const [selectedFormsToFill, setSelectedFormsToFill] = useState<FormRequirement[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -267,6 +271,17 @@ export default function FormsPage() {
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFormsToFill([f]);
+                            setFillerOpen(true);
+                          }}
+                          className="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs rounded-lg border border-purple-200 transition-colors flex items-center gap-1"
+                        >
+                          <span>✍️</span>
+                          <span>Fill Form</span>
+                        </button>
                         {formTypeBadge(f.form_type)}
                         {f.required && (
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
@@ -313,8 +328,10 @@ export default function FormsPage() {
                         )}
                       </div>
 
-                      {f.confidence && (
-                        <span className="font-mono text-[10px]">{t('forms.confidence', 'Extraction Confidence:')} {(f.confidence * 100).toFixed(0)}%</span>
+                      {f.fields && f.fields.length > 0 && (
+                        <span className="font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-100 text-[10px]">
+                          {f.fields.length} Configured Field{f.fields.length === 1 ? '' : 's'}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -325,6 +342,12 @@ export default function FormsPage() {
         </div>
 
       </div>
+
+      <FormFillerModal
+        isOpen={fillerOpen}
+        onClose={() => setFillerOpen(false)}
+        forms={selectedFormsToFill}
+      />
     </AppLayout>
   );
 }

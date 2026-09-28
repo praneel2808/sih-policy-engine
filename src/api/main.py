@@ -21,7 +21,10 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.models import ApplicantProfile, AssessmentResponse, SourceEvidence, FormRequirement
+from src.models import (
+    ApplicantProfile, AssessmentResponse, SourceEvidence,
+    FormRequirement, FormField, FormSubmissionCreate, FormSubmissionRecord,
+)
 from src.assessment import run_assessment
 from src.retrieval import LexicalRetriever
 
@@ -123,17 +126,17 @@ def get_source(chunk_id: str) -> SourceEvidence:
     return evidence
 
 
+
 @app.get("/api/forms", response_model=list[FormRequirement])
 def get_forms(
     sector: Optional[str] = Query(None, description="Filter by policy_sector (case-insensitive partial match)"),
     limit: int = Query(100, ge=1, le=500, description="Max results to return"),
     offset: int = Query(0, ge=0),
+    deduplicate: bool = Query(True, description="Filter out exact duplicate forms"),
 ) -> list[FormRequirement]:
     """
     Return extracted form requirements from the government policy corpus.
-
-    Optionally filter by sector keyword. Results include provenance:
-    source document filename, URL, and which canonical rule they belong to.
+    Deduplicates duplicate forms by default and attaches field-level blueprints.
     """
     if not os.path.exists(DB_PATH):
         raise HTTPException(status_code=503, detail="Database not available")
@@ -174,14 +177,122 @@ def get_forms(
             params.append(f"%{sector.lower()}%")
 
         base_query += " ORDER BY fr.confidence DESC, fr.form_requirement_id ASC"
-        base_query += " LIMIT ? OFFSET ?"
-        params.extend([limit, offset])
 
         rows = conn.execute(base_query, params).fetchall()
+
+        # Deduplicate forms if requested
+        import re
+        seen = set()
+        unique_rows = []
+        for r in rows:
+            d = dict(r)
+            if deduplicate:
+                name_norm = re.sub(r'[\W_]+', ' ', (d.get('form_name') or '').lower()).strip()
+                num_norm = re.sub(r'[^a-z0-9]', '', (d.get('form_number') or '').lower())
+                key = (name_norm, num_norm)
+                if key in seen and name_norm not in {'application form', 'common undertaking', 'affidavit'}:
+                    continue
+                seen.add(key)
+            unique_rows.append(d)
+
+        # Slice limit/offset after deduplication
+        sliced = unique_rows[offset : offset + limit]
+
+        # Fetch form_fields for sliced forms
+        form_objs = []
+        for d in sliced:
+            form_id = d["form_requirement_id"]
+            field_rows = conn.execute(
+                "SELECT * FROM form_fields WHERE form_requirement_id = ? ORDER BY field_order ASC",
+                (form_id,),
+            ).fetchall()
+            d["fields"] = [dict(fr) for fr in field_rows]
+            form_objs.append(FormRequirement.from_row(d))
+
     finally:
         conn.close()
 
-    return [FormRequirement.from_row(dict(row)) for row in rows]
+    return form_objs
+
+
+@app.get("/api/forms/{form_requirement_id}/fields", response_model=list[FormField])
+def get_form_fields(form_requirement_id: int) -> list[FormField]:
+    """Retrieve field-level blueprint for a single form requirement."""
+    if not os.path.exists(DB_PATH):
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    conn = _get_conn()
+    try:
+        rows = conn.execute(
+            "SELECT * FROM form_fields WHERE form_requirement_id = ? ORDER BY field_order ASC",
+            (form_requirement_id,),
+        ).fetchall()
+        return [FormField(**dict(r)) for r in rows]
+    finally:
+        conn.close()
+
+@app.post("/api/form-submissions")
+def create_form_submissions(payload: FormSubmissionCreate) -> dict:
+    """
+    Saves user-filled form responses mapped back to each individual form requirement.
+    """
+    if not os.path.exists(DB_PATH):
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    conn = _get_conn()
+    saved_ids = []
+    try:
+        import json
+        for item in payload.submissions:
+            cur = conn.execute("""
+                INSERT INTO form_submissions (
+                    project_id, entity_name, form_requirement_id, form_name, form_number, collected_values_json
+                ) VALUES (?, ?, ?, ?, ?, ?);
+            """, (
+                payload.project_id,
+                payload.entity_name,
+                item.form_requirement_id,
+                item.form_name,
+                item.form_number,
+                json.dumps(item.collected_values, ensure_ascii=False),
+            ))
+            saved_ids.append(cur.lastrowid)
+        conn.commit()
+    finally:
+        conn.close()
+
+    return {"status": "ok", "saved_submissions_count": len(saved_ids), "submission_ids": saved_ids}
+
+
+@app.get("/api/form-submissions")
+def get_form_submissions(project_id: Optional[str] = Query(None)) -> list[dict]:
+    """Retrieve saved form submissions for a project or all submissions."""
+    if not os.path.exists(DB_PATH):
+        raise HTTPException(status_code=503, detail="Database not available")
+
+    conn = _get_conn()
+    try:
+        import json
+        if project_id:
+            rows = conn.execute(
+                "SELECT * FROM form_submissions WHERE project_id = ? ORDER BY created_at DESC",
+                (project_id,),
+            ).fetchall()
+        else:
+            rows = conn.execute("SELECT * FROM form_submissions ORDER BY created_at DESC LIMIT 100").fetchall()
+        
+        results = []
+        for r in rows:
+            d = dict(r)
+            try:
+                d["collected_values"] = json.loads(d.get("collected_values_json") or "{}")
+            except Exception:
+                d["collected_values"] = {}
+            results.append(d)
+    finally:
+        conn.close()
+
+    return results
 
 
 @app.get("/api/canonical-rules")
@@ -227,8 +338,7 @@ def get_documents(
     try:
         rows = conn.execute(
             """
-            SELECT document_id, filename, source_url, page_count, file_size_bytes,
-                   language_detected, processing_status, created_at
+            SELECT document_id, filename, source_url, page_count, created_at
             FROM documents
             ORDER BY page_count DESC
             LIMIT ? OFFSET ?

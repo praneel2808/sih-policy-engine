@@ -163,6 +163,22 @@ class AssessmentResponse(BaseModel):
     )
 
 
+class FormField(BaseModel):
+    """Field-level blueprint for an actual government form."""
+    form_field_id: int
+    form_requirement_id: int
+    field_order: int
+    field_name: str
+    official_field_label: str
+    input_type: str = "text"
+    required: int = 1
+    options: Optional[str] = None
+    condition: Optional[str] = None
+    validation: Optional[str] = None
+
+    model_config = {"populate_by_name": True}
+
+
 class FormRequirement(BaseModel):
     """A single extracted form requirement from the government policy corpus."""
     form_requirement_id: int
@@ -187,6 +203,7 @@ class FormRequirement(BaseModel):
     source_url: Optional[str] = None
     rule_name: Optional[str] = None
     policy_sector: Optional[str] = None
+    fields: list[FormField] = []
 
     model_config = {"populate_by_name": True}
 
@@ -199,4 +216,30 @@ class FormRequirement(BaseModel):
         if isinstance(req, int):
             d["required"] = "MANDATORY" if req else "CONDITIONAL"
         return cls(**d)
+
+
+class FormSubmissionItem(BaseModel):
+    form_requirement_id: int
+    form_name: Optional[str] = None
+    form_number: Optional[str] = None
+    collected_values: dict = Field(default_factory=dict)
+
+
+class FormSubmissionCreate(BaseModel):
+    project_id: Optional[str] = None
+    entity_name: Optional[str] = None
+    submissions: list[FormSubmissionItem]
+
+
+class FormSubmissionRecord(BaseModel):
+    submission_id: int
+    project_id: Optional[str] = None
+    entity_name: Optional[str] = None
+    form_requirement_id: int
+    form_name: Optional[str] = None
+    form_number: Optional[str] = None
+    collected_values: dict = Field(default_factory=dict)
+    status: str = "SUBMITTED"
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
 
