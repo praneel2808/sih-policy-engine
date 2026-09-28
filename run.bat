@@ -63,7 +63,7 @@ echo Using Python: "%PYTHON_EXE%"
 
 echo.
 echo [1/3] Launching Backend API on http://127.0.0.1:8000 ...
-start "UIAS - Backend API (Port 8000)" cmd /k "cd /d "%ROOT_DIR%" && set "PATH=%PATH%" && set "PYTHONPATH=%ROOT_DIR%" && "%PYTHON_EXE%" -m uvicorn src.api.main:app --host 0.0.0.0 --port 8000"
+start "UIAS - Backend API (Port 8000)" cmd /k "cd /d "%ROOT_DIR%" && set "PATH=%PATH%" && set "PYTHONPATH=%ROOT_DIR%" && "%PYTHON_EXE%" -m uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload"
 
 echo Waiting for backend API to initialize...
 ping 127.0.0.1 -n 4 >nul

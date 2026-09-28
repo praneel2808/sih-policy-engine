@@ -405,7 +405,26 @@
 
   <!-- CLIENT JAVASCRIPT APPLICATION -->
   <script>
-    const API_BASE = "http://localhost:8000";
+    let API_BASE = "http://localhost:8000";
+
+    async function apiFetch(endpoint, options = {}) {
+      const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+      try {
+        return await fetch(url, options);
+      } catch (err) {
+        if (API_BASE.includes("localhost")) {
+          API_BASE = "http://127.0.0.1:8000";
+          const fallbackUrl = url.replace("localhost", "127.0.0.1");
+          return await fetch(fallbackUrl, options);
+        } else if (API_BASE.includes("127.0.0.1")) {
+          API_BASE = "http://localhost:8000";
+          const fallbackUrl = url.replace("127.0.0.1", "localhost");
+          return await fetch(fallbackUrl, options);
+        }
+        throw err;
+      }
+    }
+
     let currentOfficer = null;
     let allTickets = [];
     let activeTicket = null;
@@ -499,7 +518,7 @@
       document.getElementById('emptyTicketPane').classList.remove('hidden');
       document.getElementById('messagesStream').innerHTML = '';
       try {
-        const res = await fetch(`${API_BASE}/api/support/officer-login`, {
+        const res = await apiFetch(`/api/support/officer-login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
@@ -513,7 +532,11 @@
         sessionStorage.setItem('maitri_officer', JSON.stringify(currentOfficer));
         showPortalView();
       } catch (err) {
-        errBox.innerText = err.message;
+        if (err.message && err.message.toLowerCase().includes('fetch')) {
+          errBox.innerText = '⚠️ Could not connect to Backend API (http://localhost:8000). Please ensure the backend is running via run.bat.';
+        } else {
+          errBox.innerText = err.message || 'Login failed';
+        }
         errBox.classList.remove('hidden');
       }
     }
@@ -565,7 +588,7 @@
         if (deptParam) url += `department=${deptParam}&`;
         if (statusParam && statusParam !== 'All') url += `status=${encodeURIComponent(statusParam)}&`;
 
-        const res = await fetch(url);
+        const res = await apiFetch(url);
         if (!res.ok) return;
         allTickets = await res.json();
         document.getElementById('ticketCountBadge').innerText = allTickets.length;
@@ -641,7 +664,7 @@
 
     async function selectTicket(ticketId) {
       try {
-        const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}`);
+        const res = await apiFetch(`/api/support/tickets/${encodeURIComponent(ticketId)}`);
         if (!res.ok) return;
         activeTicket = await res.json();
         renderActiveTicketWorkspace();
@@ -653,7 +676,7 @@
 
     async function refreshActiveTicketDetail(ticketId) {
       try {
-        const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}`);
+        const res = await apiFetch(`/api/support/tickets/${encodeURIComponent(ticketId)}`);
         if (!res.ok) return;
         activeTicket = await res.json();
         renderActiveTicketWorkspace();
@@ -812,7 +835,7 @@
       };
 
       try {
-        const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(activeTicket.ticket_id)}/messages`, {
+        const res = await apiFetch(`/api/support/tickets/${encodeURIComponent(activeTicket.ticket_id)}/messages`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -829,7 +852,7 @@
     async function setTicketStatus(newStatus) {
       if (!activeTicket) return;
       try {
-        await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(activeTicket.ticket_id)}/status`, {
+        await apiFetch(`/api/support/tickets/${encodeURIComponent(activeTicket.ticket_id)}/status`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: newStatus, assigned_officer: currentOfficer.name })

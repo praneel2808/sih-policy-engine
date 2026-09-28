@@ -306,15 +306,35 @@ class TicketStatusUpdateRequest(BaseModel):
 class BotQueryRequest(BaseModel):
     query: str = Field(..., description="User prompt or question")
     current_page: Optional[str] = None
+    history: Optional[List[Dict[str, str]]] = None
+    applicant_context: Optional[Dict[str, Any]] = None
+    gemini_api_key: Optional[str] = None
+    target_language: Optional[str] = "en"
 
 
 # ── AI Chatbot Knowledge Base & Logic ─────────────────────────────────────────
 
-def generate_bot_response(query_text: str, current_page: Optional[str] = None) -> Dict[str, Any]:
+def generate_bot_response(
+    query_text: str,
+    current_page: Optional[str] = None,
+    history: Optional[List[Dict[str, str]]] = None,
+    applicant_context: Optional[Dict[str, Any]] = None,
+    gemini_api_key: Optional[str] = None,
+    target_language: Optional[str] = "en"
+) -> Dict[str, Any]:
     """
     Intelligently takes any question from the user and delivers refined, highly structured,
     grounded answers regarding portal functions, policies, schemes, and statutory procedures.
     """
+    from src.api.ai_policy_assistant import get_ai_bot_response
+    return get_ai_bot_response(
+        query_text=query_text,
+        current_page=current_page,
+        history=history,
+        applicant_context=applicant_context,
+        api_key=gemini_api_key,
+        target_language=target_language
+    )
     q = query_text.strip().lower()
 
     # 1. Project Assessment / Evaluation
@@ -704,7 +724,14 @@ def generate_bot_response(query_text: str, current_page: Optional[str] = None) -
 @support_router.post("/bot/query")
 def bot_query(payload: BotQueryRequest) -> Dict[str, Any]:
     """Endpoint for AI chatbot to return rich answers and action links."""
-    return generate_bot_response(payload.query, payload.current_page)
+    return generate_bot_response(
+        query_text=payload.query,
+        current_page=payload.current_page,
+        history=payload.history,
+        applicant_context=payload.applicant_context,
+        gemini_api_key=payload.gemini_api_key,
+        target_language=payload.target_language or "en",
+    )
 
 
 @support_router.post("/tickets")

@@ -2,38 +2,40 @@
 
 import type { ApplicantProfile, AssessmentResponse, SourceEvidence, FormRequirement } from "@/types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+let activeApiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+export async function apiFetch(path: string, options?: RequestInit): Promise<Response> {
+  const url = path.startsWith("http") ? path : `${activeApiBase}${path}`;
+  try {
+    return await fetch(url, options);
+  } catch (err) {
+    if (activeApiBase.includes("localhost")) {
+      activeApiBase = activeApiBase.replace("localhost", "127.0.0.1");
+      const fallbackUrl = path.startsWith("http")
+        ? path.replace("localhost", "127.0.0.1")
+        : `${activeApiBase}${path}`;
+      return await fetch(fallbackUrl, options);
+    } else if (activeApiBase.includes("127.0.0.1")) {
+      activeApiBase = activeApiBase.replace("127.0.0.1", "localhost");
+      const fallbackUrl = path.startsWith("http")
+        ? path.replace("127.0.0.1", "localhost")
+        : `${activeApiBase}${path}`;
+      return await fetch(fallbackUrl, options);
+    }
+    throw new Error(
+      `Network Error: Could not connect to the Backend API at ${activeApiBase}. Please ensure the backend server is running on port 8000.`
+    );
+  }
+}
 
 export async function submitAssessment(
   profile: ApplicantProfile
 ): Promise<AssessmentResponse> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE}/api/assessment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profile),
-    });
-  } catch {
-    if (API_BASE.includes("localhost")) {
-      try {
-        const fallbackUrl = API_BASE.replace("localhost", "127.0.0.1");
-        res = await fetch(`${fallbackUrl}/api/assessment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(profile),
-        });
-      } catch {
-        throw new Error(
-          `Network Error: Could not connect to the Backend API at ${API_BASE}. Please ensure the backend server is running on port 8000.`
-        );
-      }
-    } else {
-      throw new Error(
-        `Network Error: Could not connect to the Backend API at ${API_BASE}. Please ensure the backend server is running on port 8000.`
-      );
-    }
-  }
+  const res = await apiFetch(`/api/assessment`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(profile),
+  });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
@@ -49,7 +51,7 @@ export async function submitAssessment(
 }
 
 export async function getSource(chunkId: string): Promise<SourceEvidence> {
-  const res = await fetch(`${API_BASE}/api/sources/${encodeURIComponent(chunkId)}`);
+  const res = await apiFetch(`/api/sources/${encodeURIComponent(chunkId)}`);
   if (!res.ok) throw new Error("Source not found");
   return res.json();
 }
@@ -57,13 +59,13 @@ export async function getSource(chunkId: string): Promise<SourceEvidence> {
 export async function getForms(sector?: string): Promise<FormRequirement[]> {
   const params = new URLSearchParams({ limit: "200", deduplicate: "true" });
   if (sector) params.set("sector", sector);
-  const res = await fetch(`${API_BASE}/api/forms?${params.toString()}`);
+  const res = await apiFetch(`/api/forms?${params.toString()}`);
   if (!res.ok) throw new Error("Could not load form requirements");
   return res.json();
 }
 
 export async function getFormFields(formRequirementId: number): Promise<any[]> {
-  const res = await fetch(`${API_BASE}/api/forms/${formRequirementId}/fields`);
+  const res = await apiFetch(`/api/forms/${formRequirementId}/fields`);
   if (!res.ok) throw new Error("Could not load form fields");
   return res.json();
 }
@@ -78,7 +80,7 @@ export async function submitFormSubmissions(payload: {
     collected_values: Record<string, any>;
   }>;
 }): Promise<any> {
-  const res = await fetch(`${API_BASE}/api/form-submissions`, {
+  const res = await apiFetch(`/api/form-submissions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -88,7 +90,7 @@ export async function submitFormSubmissions(payload: {
 }
 
 export async function healthCheck(): Promise<{ status: string; db_exists: boolean; gemini_active: boolean }> {
-  const res = await fetch(`${API_BASE}/api/health`);
+  const res = await apiFetch(`/api/health`);
   if (!res.ok) throw new Error("Backend not reachable");
   return res.json();
 }
@@ -102,7 +104,7 @@ export async function getDbHealth(): Promise<{
   canonical_rules: number;
   form_requirements: number;
 }> {
-  const res = await fetch(`${API_BASE}/api/health/db`);
+  const res = await apiFetch(`/api/health/db`);
   if (!res.ok) throw new Error("Could not fetch DB health");
   return res.json();
 }
@@ -110,14 +112,14 @@ export async function getDbHealth(): Promise<{
 export async function getCanonicalRules(sector?: string, limit = 50): Promise<{ total: number; rules: any[] }> {
   const params = new URLSearchParams({ limit: String(limit) });
   if (sector) params.set("sector", sector);
-  const res = await fetch(`${API_BASE}/api/canonical-rules?${params.toString()}`);
+  const res = await apiFetch(`/api/canonical-rules?${params.toString()}`);
   if (!res.ok) throw new Error("Could not load canonical rules");
   return res.json();
 }
 
 export async function getDocuments(limit = 50): Promise<{ total: number; documents: any[] }> {
   const params = new URLSearchParams({ limit: String(limit) });
-  const res = await fetch(`${API_BASE}/api/documents?${params.toString()}`);
+  const res = await apiFetch(`/api/documents?${params.toString()}`);
   if (!res.ok) throw new Error("Could not load documents");
   return res.json();
 }
@@ -169,7 +171,7 @@ export async function registerUser(data: {
   women_led_enterprise?: boolean;
   student_led_enterprise?: boolean;
 }): Promise<{ user_id: number; username: string; entity_name: string; assessment: AssessmentResponse }> {
-  const res = await fetch(`${API_BASE}/api/auth/register`, {
+  const res = await apiFetch(`/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -188,7 +190,7 @@ export async function loginUser(username: string, password: string): Promise<{
   profile: Record<string, any>;
   assessment: AssessmentResponse | null;
 }> {
-  const res = await fetch(`${API_BASE}/api/auth/login`, {
+  const res = await apiFetch(`/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
@@ -205,7 +207,7 @@ export async function updateProfile(userId: number, data: Record<string, any>): 
   profile: Record<string, any>;
   assessment: AssessmentResponse;
 }> {
-  const res = await fetch(`${API_BASE}/api/auth/profile/${userId}`, {
+  const res = await apiFetch(`/api/auth/profile/${userId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -218,13 +220,13 @@ export async function updateProfile(userId: number, data: Record<string, any>): 
 }
 
 export async function getUserAssessment(userId: number): Promise<{ assessment: AssessmentResponse | null }> {
-  const res = await fetch(`${API_BASE}/api/auth/assessment/${userId}`);
+  const res = await apiFetch(`/api/auth/assessment/${userId}`);
   if (!res.ok) throw new Error('Could not load assessment');
   return res.json();
 }
 
 export async function deleteAccount(userId: number): Promise<{ status: string; message: string }> {
-  const res = await fetch(`${API_BASE}/api/auth/account/${userId}`, {
+  const res = await apiFetch(`/api/auth/account/${userId}`, {
     method: 'DELETE',
   });
   if (!res.ok) {
@@ -293,11 +295,25 @@ export interface BotResponse {
   prefill_inquiry?: string;
 }
 
-export async function askSupportBot(query: string, currentPage?: string): Promise<BotResponse> {
-  const res = await fetch(`${API_BASE}/api/support/bot/query`, {
+export async function askSupportBot(
+  query: string,
+  currentPage?: string,
+  history?: Array<{ sender: 'user' | 'bot'; text: string }>,
+  applicantContext?: Record<string, any>,
+  geminiApiKey?: string,
+  targetLanguage?: string
+): Promise<BotResponse> {
+  const res = await apiFetch(`/api/support/bot/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, current_page: currentPage }),
+    body: JSON.stringify({
+      query,
+      current_page: currentPage,
+      history,
+      applicant_context: applicantContext,
+      gemini_api_key: geminiApiKey,
+      target_language: targetLanguage || 'en',
+    }),
   });
   if (!res.ok) throw new Error('AI Assistant service unavailable');
   return res.json();
@@ -322,7 +338,7 @@ export async function createSupportTicket(data: {
   attachment_data?: string;
   attachment_size?: number;
 }): Promise<{ status: string; ticket_id: string; message: string }> {
-  const res = await fetch(`${API_BASE}/api/support/tickets`, {
+  const res = await apiFetch(`/api/support/tickets`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -338,13 +354,13 @@ export async function getSupportTickets(department?: string, status?: string): P
   const params = new URLSearchParams();
   if (department && department !== 'All') params.set('department', department);
   if (status && status !== 'All') params.set('status', status);
-  const res = await fetch(`${API_BASE}/api/support/tickets?${params.toString()}`);
+  const res = await apiFetch(`/api/support/tickets?${params.toString()}`);
   if (!res.ok) throw new Error('Could not fetch support tickets');
   return res.json();
 }
 
 export async function getSupportTicketDetail(ticketId: string): Promise<SupportTicket> {
-  const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}`);
+  const res = await apiFetch(`/api/support/tickets/${encodeURIComponent(ticketId)}`);
   if (!res.ok) throw new Error('Could not load ticket detail');
   return res.json();
 }
@@ -362,7 +378,7 @@ export async function postTicketMessage(
     attachment_size?: number;
   }
 ): Promise<{ status: string; message: string }> {
-  const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}/messages`, {
+  const res = await apiFetch(`/api/support/tickets/${encodeURIComponent(ticketId)}/messages`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -376,7 +392,7 @@ export async function updateTicketStatus(
   status: string,
   assignedOfficer?: string
 ): Promise<{ status: string; new_status: string }> {
-  const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}/status`, {
+  const res = await apiFetch(`/api/support/tickets/${encodeURIComponent(ticketId)}/status`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status, assigned_officer: assignedOfficer }),

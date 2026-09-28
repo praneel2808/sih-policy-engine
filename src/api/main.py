@@ -81,12 +81,13 @@ def _get_conn() -> sqlite3.Connection:
 def health() -> dict:
     """Health check — verifies DB is accessible."""
     db_exists = os.path.exists(DB_PATH)
+    from src.api.ai_policy_assistant import is_gemini_active
     return {
         "status": "ok",
         "db_path": DB_PATH,
         "db_exists": db_exists,
         "version": "0.2.0",
-        "gemini_active": False,
+        "gemini_active": is_gemini_active(),
     }
 
 

@@ -184,40 +184,162 @@ const PRE_OPTIONS = [
   },
 ];
 
-// Categorized Pre-Questions for AI Chatbot
-const QUICK_PROMPTS_CATEGORIES = [
-  {
-    category: 'Core Portal',
-    items: [
-      '🎯 How does Project Assessment work?',
-      '📊 Where do I see assessment results?',
-      '📝 Where do I auto-fill CAF forms?',
-      '🔍 How to track application SLA status?',
+// Localized Welcome Messages for all 3 official portal languages
+const WELCOME_MESSAGES: Record<'en' | 'mr' | 'hi', { text: string; suggested_questions: string[] }> = {
+  en: {
+    text:
+      "### 🏛️ Welcome to Maharashtra UIAS Assistant\n\n" +
+      "Namaskar! 🙏 I am your **Maharashtra Single Window Digital Assistant**.\n\n" +
+      "I can assist you with:\n" +
+      "- **Project Assessment (`/assess`)** — Evaluate statutory clearances & subsidy eligibility in 3 simple steps.\n" +
+      "- **Incentives & Schemes (`/incentives`)** — Calculate Gross SGST reimbursement (30% to 100%), 5% interest subsidy, and electricity duty exemption under PSI-2019.\n" +
+      "- **Forms Repository (`/forms`)** — Search and auto-fill 186+ codified government application forms.\n" +
+      "- **Clearances & Compliance (`/approvals`)** — Guidelines for MPCB (CTE/CTO), Fire NOC, MIDC, and DISHT licenses.\n" +
+      "- **Live Officer Desk** — Connect live with a Single Window Officer from the Directorate of Industries.\n\n" +
+      "What question can I answer for your enterprise today?",
+    suggested_questions: [
+      'How do I assess my project?',
+      'What subsidies under PSI-2019?',
+      'How to get MPCB Consent?',
+      'Industrial power tariff concessions',
     ],
   },
-  {
-    category: 'Subsidies & PSI-2019',
-    items: [
-      '💰 What subsidies under PSI-2019?',
-      '⚡ Industrial power tariff concessions',
-      '👩‍💼 Women & SC/ST entrepreneur incentives',
-      '🗺️ Which Talukas belong to Zone D+?',
+  mr: {
+    text:
+      "### 🏛️ महाराष्ट्र UIAS डिजिटल सहाय्यक\n\n" +
+      "नमस्कार! 🙏 मी आपला **महाराष्ट्र एक खिडकी डिजिटल सहाय्यक** आहे.\n\n" +
+      "मी आपल्याला खालील बाबींमध्ये सहाय्य करू शकतो:\n" +
+      "- **प्रकल्प मूल्यमापन (`/assess`)** — ३ सोप्या टप्प्यांत वैधानिक परवानग्या आणि अनुदान पात्रता तपासा.\n" +
+      "- **प्रोत्साहने आणि योजना (`/incentives`)** — PSI-2019 अंतर्गत ३०% ते १००% एकूण SGST परतावा, ५% व्याज सवलत आणि वीज शुल्क माफी.\n" +
+      "- **अर्ज व फॉर्म भांडार (`/forms`)** — १८६+ शासकीय अर्ज शोधा आणि स्वयं-भरा (Auto-fill).\n" +
+      "- **मंजुऱ्या आणि अनुपालन (`/approvals`)** — MPCB (CTE/CTO), अग्निशमन NOC, MIDC आणि कारखाना परवाना मार्गदर्शन.\n" +
+      "- **थेट अधिकारी कक्ष (Live Officer)** — उद्योग संचालनालयाच्या अधिकाऱ्यांशी थेट संपर्क साधा.\n\n" +
+      "आज आपल्या उद्योगाबद्दल मी काय मदत करू शकतो?",
+    suggested_questions: [
+      'माझ्या प्रकल्पाचे मूल्यमापन कसे करावे?',
+      'PSI-2019 अंतर्गत कोणते अनुदान मिळते?',
+      'MPCB संमती (CTE/CTO) कशी मिळवावी?',
+      'औद्योगिक वीज दर सवलत काय आहे?',
     ],
   },
-  {
-    category: 'Clearances & Policies',
-    items: [
-      '🌿 How to get MPCB Consent (CTE/CTO)?',
-      '🚒 Fire Safety NOC requirements',
-      '🏢 MIDC industrial land allotment',
-      '🚗 Electric Vehicle (EV) Policy 2025',
-      '🧵 Textile Policy 2023-2028 capital subsidy',
+  hi: {
+    text:
+      "### 🏛️ महाराष्ट्र UIAS डिजिटल सहायक\n\n" +
+      "नमस्कार! 🙏 मैं आपका **महाराष्ट्र एकल खिड़की डिजिटल सहायक** हूँ।\n\n" +
+      "मैं आपकी इन विषयों में सहायता कर सकता हूँ:\n" +
+      "- **परियोजना मूल्यांकन (`/assess`)** — ३ सरल चरणों में वैधानिक स्वीकृतियां और सब्सिडी पात्रता जांचें।\n" +
+      "- **प्रोत्साहन और योजनाएं (`/incentives`)** — PSI-2019 के तहत ३०% से १००% सकल SGST प्रतिपूर्ति, ५% ब्याज सब्सिडी और बिजली शुल्क छूट।\n" +
+      "- **फॉर्म भंडार (`/forms`)** — १८६+ आधिकारिक सरकारी आवेदन पत्र खोजें और स्वतः भरें।\n" +
+      "- **स्वीकृतियां और अनुपालन (`/approvals`)** — MPCB (CTE/CTO), अग्निशमन NOC, MIDC और कारखाना लाइसेंस दिशानिर्देश।\n" +
+      "- **लाइव अधिकारी डेस्क** — उद्योग निदेशालय के एकल खिड़की अधिकारी से सीधा संवाद करें।\n\n" +
+      "आज आपके उद्यम के लिए मैं क्या सहायता कर सकता हूँ?",
+    suggested_questions: [
+      'परियोजना का मूल्यांकन कैसे करें?',
+      'PSI-2019 के तहत कौन सी सब्सिडी मिलती है?',
+      'MPCB सहमति (CTE/CTO) कैसे प्राप्त करें?',
+      'औद्योगिक बिजली शुल्क रियायतें क्या हैं?',
     ],
   },
-];
+};
+
+// Categorized Pre-Questions for AI Chatbot across 3 Languages
+const QUICK_PROMPTS_CATEGORIES_BY_LANG: Record<'en' | 'mr' | 'hi', Array<{ category: string; items: string[] }>> = {
+  en: [
+    {
+      category: 'Core Portal',
+      items: [
+        '🎯 How does Project Assessment work?',
+        '📊 Where do I see assessment results?',
+        '📝 Where do I auto-fill CAF forms?',
+        '🔍 How to track application SLA status?',
+      ],
+    },
+    {
+      category: 'Subsidies & PSI-2019',
+      items: [
+        '💰 What subsidies under PSI-2019?',
+        '⚡ Industrial power tariff concessions',
+        '👩‍💼 Women & SC/ST entrepreneur incentives',
+        '🗺️ Which Talukas belong to Zone D+?',
+      ],
+    },
+    {
+      category: 'Clearances & Policies',
+      items: [
+        '🌿 How to get MPCB Consent (CTE/CTO)?',
+        '🚒 Fire Safety NOC requirements',
+        '🏢 MIDC industrial land allotment',
+        '🚗 Electric Vehicle (EV) Policy 2025',
+        '🧵 Textile Policy 2023-2028 capital subsidy',
+      ],
+    },
+  ],
+  mr: [
+    {
+      category: 'पोर्टल कार्यपद्धती',
+      items: [
+        '🎯 प्रकल्प मूल्यमापन कसे काम करते?',
+        '📊 मूल्यमापन निकाल कुठे पाहता येतील?',
+        '📝 CAF अर्ज स्वयं-भरणे कसे करावे?',
+        '🔍 अर्जाची SLA स्थिती कशी तपासावी?',
+      ],
+    },
+    {
+      category: 'अनुदान व PSI-2019',
+      items: [
+        '💰 PSI-2019 अंतर्गत कोणते अनुदान मिळते?',
+        '⚡ औद्योगिक वीज दर सवलत काय आहे?',
+        '👩‍💼 महिला व SC/ST उद्योजक सवलती',
+        '🗺️ कोणते तालुके Zone D+ मध्ये येतात?',
+      ],
+    },
+    {
+      category: 'परवानग्या व धोरणे',
+      items: [
+        '🌿 MPCB संमती (CTE/CTO) कशी मिळवावी?',
+        '🚒 अग्निशमन सुरक्षा NOC आवश्यकता',
+        '🏢 MIDC औद्योगिक भूखंड वाटप प्रक्रिया',
+        '🚗 इलेक्ट्रिक वाहन (EV) धोरण २०२५',
+        '🧵 वस्त्रोद्योग धोरण २०२३-२०२८ भांडवली अनुदान',
+      ],
+    },
+  ],
+  hi: [
+    {
+      category: 'पोर्टल सुविधाएं',
+      items: [
+        '🎯 परियोजना मूल्यांकन कैसे कार्य करता है?',
+        '📊 मूल्यांकन परिणाम कहां देखें?',
+        '📝 CAF फॉर्म स्वतः कैसे भरें?',
+        '🔍 आवेदन की SLA स्थिति कैसे ट्रैक करें?',
+      ],
+    },
+    {
+      category: 'सब्सिडी व PSI-2019',
+      items: [
+        '💰 PSI-2019 के तहत क्या सब्सिडी मिलती है?',
+        '⚡ औद्योगिक बिजली शुल्क रियायतें',
+        '👩‍💼 महिला व SC/ST उद्यमी प्रोत्साहन',
+        '🗺️ कौन से तालुके Zone D+ में आते हैं?',
+      ],
+    },
+    {
+      category: 'स्वीकृतियां व नीतियां',
+      items: [
+        '🌿 MPCB सहमति (CTE/CTO) कैसे प्राप्त करें?',
+        '🚒 अग्निशमन सुरक्षा NOC की आवश्यकताएं',
+        '🏢 MIDC औद्योगिक भूमि आवंटन प्रक्रिया',
+        '🚗 इलेक्ट्रिक वाहन (EV) नीति २०२५',
+        '🧵 वस्त्रोद्योग नीति २०२३-२०२८ पूंजीगत सब्सिडी',
+      ],
+    },
+  ],
+};
+
+const DEFAULT_GEMINI_KEY = 'AQ.Ab8RN6LFfTFjz2k8KnJOoIcDVM2mtZm7FQRq9Z-CI6-p5WbrzA';
 
 export default function AiSupportWidget() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'ai' | 'live' | 'helpline'>('ai');
@@ -226,8 +348,32 @@ export default function AiSupportWidget() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [typingStatus, setTypingStatus] = useState<string>('Analyzing your question...');
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [customApiKey, setCustomApiKey] = useState<string>(DEFAULT_GEMINI_KEY);
+  const [showKeyModal, setShowKeyModal] = useState<boolean>(false);
+  const [tempApiKey, setTempApiKey] = useState<string>(DEFAULT_GEMINI_KEY);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cancelStreamingRef = useRef<(() => void) | null>(null);
+  const messagesRef = useRef<ChatMessage[]>(messages);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+    if (!streamingMessageId && messages.length > 0) {
+      try {
+        localStorage.setItem('smsws_chat_messages', JSON.stringify(messages));
+      } catch (e) {}
+    }
+  }, [messages, streamingMessageId]);
+
+  // Audio Speech Synthesis & Voice Recognition for 3 Languages (English, Marathi, Hindi)
+  const [audioLang, setAudioLang] = useState<'en' | 'mr' | 'hi'>((lang as 'en' | 'mr' | 'hi') || 'en');
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [isAutoSpeak, setIsAutoSpeak] = useState<boolean>(false);
+  const [isListening, setIsListening] = useState<boolean>(false);
+  const recognitionRef = useRef<any>(null);
 
   // Live Agent Tab State
   const [applicantName, setApplicantName] = useState('');
@@ -254,7 +400,23 @@ export default function AiSupportWidget() {
   const citizenFileInputRef = useRef<HTMLInputElement>(null);
   const liveChatEndRef = useRef<HTMLDivElement>(null);
 
-  // Pre-fill user profile info from localStorage
+  // Helper to persist open/closed state
+  const handleToggleOpen = (open: boolean) => {
+    setIsOpen(open);
+    try {
+      localStorage.setItem('smsws_widget_is_open', open ? 'true' : 'false');
+    } catch (e) {}
+  };
+
+  // Helper to persist active tab
+  const handleTabChange = (tab: 'ai' | 'live' | 'helpline') => {
+    setActiveTab(tab);
+    try {
+      localStorage.setItem('smsws_widget_active_tab', tab);
+    } catch (e) {}
+  };
+
+  // Pre-fill user profile info and restore chat history from localStorage
   useEffect(() => {
     try {
       const userRaw = localStorage.getItem('smsws_user');
@@ -275,44 +437,105 @@ export default function AiSupportWidget() {
       if (savedTicketId) {
         setActiveTicketId(savedTicketId);
       }
+      const savedKey = localStorage.getItem('smsws_gemini_key');
+      if (savedKey) {
+        setCustomApiKey(savedKey);
+        setTempApiKey(savedKey);
+      } else {
+        setCustomApiKey(DEFAULT_GEMINI_KEY);
+        setTempApiKey(DEFAULT_GEMINI_KEY);
+      }
+
+      // Restore widget open state across page transitions
+      const savedIsOpen = localStorage.getItem('smsws_widget_is_open');
+      if (savedIsOpen === 'true') {
+        setIsOpen(true);
+      }
+
+      // Restore active tab
+      const savedTab = localStorage.getItem('smsws_widget_active_tab') as 'ai' | 'live' | 'helpline';
+      if (savedTab && ['ai', 'live', 'helpline'].includes(savedTab)) {
+        setActiveTab(savedTab);
+      }
+
+      // Restore chat messages so navigation across pages does not reset conversations
+      const savedMessagesRaw = localStorage.getItem('smsws_chat_messages');
+      if (savedMessagesRaw) {
+        try {
+          const parsed = JSON.parse(savedMessagesRaw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMessages(parsed);
+            messagesRef.current = parsed;
+            return;
+          }
+        } catch (e) {
+          console.error('Failed to parse saved chat messages:', e);
+        }
+      }
+
+      // If no prior chat messages, load welcome message in active language
+      const activeLanguage = (lang as 'en' | 'mr' | 'hi') || 'en';
+      const welcomeConfig = WELCOME_MESSAGES[activeLanguage] || WELCOME_MESSAGES.en;
+      const initialWelcome: ChatMessage[] = [
+        {
+          id: 'welcome',
+          sender: 'bot',
+          text: welcomeConfig.text,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          suggested_questions: welcomeConfig.suggested_questions,
+        },
+      ];
+      setMessages(initialWelcome);
+      messagesRef.current = initialWelcome;
+      localStorage.setItem('smsws_chat_messages', JSON.stringify(initialWelcome));
     } catch (e) {
       console.error(e);
     }
   }, []);
 
-  // Initialize bot welcome message
+  // Synchronize audio language and welcome message ONLY if chat has not had any user queries yet
   useEffect(() => {
-    setMessages([
-      {
-        id: 'welcome',
-        sender: 'bot',
-        text:
-          "### 🏛️ Welcome to Maharashtra UIAS Assistant\n\n" +
-          "Namaskar! 🙏 I am your **Maharashtra Single Window Digital Assistant**.\n\n" +
-          "I can assist you with:\n" +
-          "- **Project Assessment (`/assess`)** — Evaluate statutory clearances & subsidy eligibility in 3 simple steps.\n" +
-          "- **Incentives & Schemes (`/incentives`)** — Calculate Gross SGST reimbursement (30% to 100%), 5% interest subsidy, and electricity duty exemption under PSI-2019.\n" +
-          "- **Forms Repository (`/forms`)** — Search and auto-fill 186+ codified government application forms.\n" +
-          "- **Clearances & Compliance (`/approvals`)** — Guidelines for MPCB (CTE/CTO), Fire NOC, MIDC, and DISHT licenses.\n" +
-          "- **Live Officer Desk** — Connect live with a Single Window Officer from the Directorate of Industries.\n\n" +
-          "What question can I answer for your enterprise today?",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        suggested_questions: [
-          'How do I assess my project?',
-          'What subsidies under PSI-2019?',
-          'How to get MPCB Consent?',
-          'Industrial power tariff concessions',
-        ],
-      },
-    ]);
-  }, [t]);
+    const activeLanguage = (lang as 'en' | 'mr' | 'hi') || 'en';
+    setAudioLang(activeLanguage);
+
+    const welcomeConfig = WELCOME_MESSAGES[activeLanguage] || WELCOME_MESSAGES.en;
+
+    setMessages((prev) => {
+      // Only replace if the chat contains only the initial welcome message (no user conversation yet)
+      if (prev.length === 1 && prev[0].id === 'welcome') {
+        const updated: ChatMessage[] = [
+          {
+            id: 'welcome',
+            sender: 'bot',
+            text: welcomeConfig.text,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            suggested_questions: welcomeConfig.suggested_questions,
+          },
+        ];
+        try {
+          localStorage.setItem('smsws_chat_messages', JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      }
+      return prev;
+    });
+  }, [lang]);
 
   // Scroll to bottom
   useEffect(() => {
     if (isOpen && activeTab === 'ai') {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen, activeTab, isTyping]);
+  }, [messages, isOpen, activeTab, isTyping, streamingMessageId]);
+
+  // Clean up streaming timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (streamingTimeoutRef.current) {
+        clearTimeout(streamingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (isOpen && activeTab === 'live') {
@@ -337,6 +560,194 @@ export default function AiSupportWidget() {
     const interval = setInterval(fetchTicket, 3000);
     return () => clearInterval(interval);
   }, [activeTicketId]);
+
+  // Synchronize audio language with portal language
+  useEffect(() => {
+    if (lang === 'mr' || lang === 'hi' || lang === 'en') {
+      setAudioLang(lang);
+    }
+  }, [lang]);
+
+  // Handle explicit language switch from Audio Toolbar or user action
+  const handleSwitchLanguage = (newLang: 'en' | 'mr' | 'hi') => {
+    setAudioLang(newLang);
+    stopAudio();
+    const welcomeConfig = WELCOME_MESSAGES[newLang] || WELCOME_MESSAGES.en;
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0].id === 'welcome') {
+        const updated: ChatMessage[] = [
+          {
+            id: 'welcome',
+            sender: 'bot',
+            text: welcomeConfig.text,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            suggested_questions: welcomeConfig.suggested_questions,
+          },
+        ];
+        try {
+          localStorage.setItem('smsws_chat_messages', JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      }
+      return prev;
+    });
+  };
+
+  // Clean Markdown for natural voice speech
+  const cleanMarkdownForSpeech = (text: string): string => {
+    if (!text) return '';
+    return text
+      .replace(/```[\s\S]*?```/g, '') // remove code blocks
+      .replace(/^#+\s+/gm, '') // remove header hashes
+      .replace(/\*\*([^*]+)\*\*/g, '$1') // remove bold asterisks
+      .replace(/\*([^*]+)\*/g, '$1') // remove italics
+      .replace(/`([^`]+)`/g, '$1') // remove inline code
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // convert markdown links to text
+      .replace(/https?:\/\/\S+/g, '') // remove bare URLs
+      .replace(/^[\s-*•👉>]+/gm, '') // remove bullet points and blockquotes
+      .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '') // remove emojis
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  // Stop active speech synthesis
+  const stopAudio = () => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setSpeakingMessageId(null);
+  };
+
+  // Play voice narration for bot message in selected language
+  const playMessageAudio = (msgId: string, rawText: string, forcedLang?: 'en' | 'mr' | 'hi') => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      alert('Audio speech synthesis is not supported on this browser.');
+      return;
+    }
+
+    if (speakingMessageId === msgId) {
+      stopAudio();
+      return;
+    }
+
+    stopAudio();
+
+    const targetLang = forcedLang || audioLang;
+    const cleanText = cleanMarkdownForSpeech(rawText);
+    if (!cleanText) return;
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    const voices = window.speechSynthesis.getVoices();
+
+    let selectedVoice: SpeechSynthesisVoice | undefined;
+
+    if (targetLang === 'mr') {
+      selectedVoice =
+        voices.find((v) => v.lang.toLowerCase().startsWith('mr') || v.name.toLowerCase().includes('marathi')) ||
+        voices.find((v) => v.lang.toLowerCase().startsWith('hi') || v.name.toLowerCase().includes('hindi')) ||
+        voices.find((v) => v.lang.toLowerCase().includes('in'));
+      utterance.lang = selectedVoice?.lang || 'mr-IN';
+    } else if (targetLang === 'hi') {
+      selectedVoice =
+        voices.find((v) => v.lang.toLowerCase().startsWith('hi') || v.name.toLowerCase().includes('hindi')) ||
+        voices.find((v) => v.lang.toLowerCase().includes('in'));
+      utterance.lang = selectedVoice?.lang || 'hi-IN';
+    } else {
+      selectedVoice =
+        voices.find((v) => v.lang.toLowerCase().startsWith('en-in') || v.name.toLowerCase().includes('india')) ||
+        voices.find((v) => v.lang.toLowerCase().startsWith('en'));
+      utterance.lang = selectedVoice?.lang || 'en-IN';
+    }
+
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    }
+
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    utterance.onstart = () => {
+      setSpeakingMessageId(msgId);
+    };
+
+    utterance.onend = () => {
+      setSpeakingMessageId(null);
+    };
+
+    utterance.onerror = () => {
+      setSpeakingMessageId(null);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Toggle voice input (Speech to Text)
+  const toggleSpeechRecognition = () => {
+    if (typeof window === 'undefined') return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert('Voice microphone input is not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      if (audioLang === 'mr') {
+        recognition.lang = 'mr-IN';
+      } else if (audioLang === 'hi') {
+        recognition.lang = 'hi-IN';
+      } else {
+        recognition.lang = 'en-IN';
+      }
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join('');
+        setInput(transcript);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.warn('Speech recognition error:', err);
+      setIsListening(false);
+    }
+  };
+
+  // Clean up audio on unmount
+  useEffect(() => {
+    return () => {
+      stopAudio();
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, []);
 
   // Handle citizen file attachment
   const handleCitizenFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -377,7 +788,7 @@ export default function AiSupportWidget() {
 
   // Transfer AI question to Live Officer Desk
   const handleTransferToLiveOfficer = (botMsg: ChatMessage) => {
-    setActiveTab('live');
+    handleTabChange('live');
     const targetDept = botMsg.recommended_department || 'General Inquiries';
     if (activeTicket && activeTicket.department !== targetDept) {
       setActiveTicketId(null);
@@ -389,9 +800,17 @@ export default function AiSupportWidget() {
     setLiveQuestion(botMsg.prefill_inquiry || 'I need official guidance from a Single Window Officer on this matter.');
   };
 
-  // Send AI Chat Query
+  // Send AI Chat Query with Natural Delayed Animation & Streaming
   const handleBotQuery = async (queryText: string) => {
     if (!queryText.trim()) return;
+
+    // Stop active audio narration if playing
+    stopAudio();
+
+    // If an animation is already actively streaming, complete it immediately
+    if (cancelStreamingRef.current) {
+      cancelStreamingRef.current();
+    }
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
@@ -401,42 +820,186 @@ export default function AiSupportWidget() {
     };
 
     setMessages((prev) => [...prev, userMsg]);
+    messagesRef.current = [...messagesRef.current, userMsg];
     setInput('');
+    const currentLang = (audioLang || lang || 'en') as 'en' | 'mr' | 'hi';
+    const statusMessages: Record<'en' | 'mr' | 'hi', string[]> = {
+      mr: [
+        '🧠 आपल्या प्रश्नाचे विश्लेषण करत आहे...',
+        '🔍 महाराष्ट्र शासन राजपत्रे आणि १,२७९ नियमांचा शोध सुरू आहे...',
+        '⚖️ कायदेशीर निकष व अनुदानांची पडताळणी सुरू आहे...',
+        '✍️ अधिकृत धोरण मार्गदर्शन तयार करत आहे...',
+      ],
+      hi: [
+        '🧠 आपके प्रश्न का विश्लेषण किया जा रहा है...',
+        '🔍 महाराष्ट्र राजपत्र और १,२७९ नियमों की खोज जारी है...',
+        '⚖️ वैधानिक पात्रता एवं सब्सिडी की पुष्टि हो रही है...',
+        '✍️ आधिकारिक नीति मार्गदर्शन तैयार किया जा रहा है...',
+      ],
+      en: [
+        '🧠 Analyzing enterprise question...',
+        '🔍 Searching Maharashtra Gazettes & 1,279 Rules...',
+        '⚖️ Verifying statutory compliance & incentive slabs...',
+        '✍️ Formulating official policy guidance...',
+      ],
+    };
+    const statuses = statusMessages[currentLang] || statusMessages.en;
+
     setIsTyping(true);
+    setTypingStatus(statuses[0]);
+
+    const statusTimer1 = setTimeout(() => {
+      setTypingStatus(statuses[1]);
+    }, 280);
+
+    const statusTimer2 = setTimeout(() => {
+      setTypingStatus(statuses[2]);
+    }, 560);
+
+    const statusTimer3 = setTimeout(() => {
+      setTypingStatus(statuses[3]);
+    }, 840);
+
+    // Prepare conversation history from synchronized ref (last 6 completed turns)
+    const historyPayload = messagesRef.current
+      .filter((m) => m.text && m.text.trim().length > 0)
+      .slice(-6)
+      .map((m) => ({
+        sender: m.sender,
+        text: m.text,
+      }));
+
+    // Enterprise profile context from state
+    const applicantContext = {
+      applicant_name: applicantName,
+      entity_name: entityName,
+      district,
+      stage: currentStage,
+      sector: selectedDept,
+    };
 
     try {
-      const resp = await askSupportBot(queryText.trim(), pathname);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          sender: 'bot',
-          text: resp.reply,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          action_links: resp.action_links,
-          suggested_questions: resp.suggested_questions,
-          recommended_department: resp.recommended_department,
-          prefill_inquiry: resp.prefill_inquiry || queryText.trim(),
-        },
+      const respPromise = askSupportBot(
+        queryText.trim(),
+        pathname,
+        historyPayload,
+        applicantContext,
+        customApiKey || undefined,
+        currentLang
+      );
+
+      // Enforce natural AI thinking pacing: minimum 900ms so user can comfortably see what's happening without waiting too long
+      const [resp] = await Promise.all([
+        respPromise,
+        new Promise((resolve) => setTimeout(resolve, 900)),
       ]);
+
+      clearTimeout(statusTimer1);
+      clearTimeout(statusTimer2);
+      clearTimeout(statusTimer3);
+      setIsTyping(false);
+
+      const botMsgId = (Date.now() + 1).toString();
+      const fullText = resp.reply;
+
+      const initialBotMsg: ChatMessage = {
+        id: botMsgId,
+        sender: 'bot',
+        text: '',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        action_links: resp.action_links,
+        suggested_questions: resp.suggested_questions,
+        recommended_department: resp.recommended_department,
+        prefill_inquiry: resp.prefill_inquiry || queryText.trim(),
+      };
+
+      setMessages((prev) => [...prev, initialBotMsg]);
+      messagesRef.current = [...messagesRef.current, initialBotMsg];
+      setStreamingMessageId(botMsgId);
+
+      // Word / Token chunking for smooth typewriter effect
+      const chunks = fullText.split(/(\s+)/);
+      let currentIdx = 0;
+      let accumulatedText = '';
+      let isCancelled = false;
+
+      cancelStreamingRef.current = () => {
+        isCancelled = true;
+        if (streamingTimeoutRef.current) clearTimeout(streamingTimeoutRef.current);
+        setMessages((prev) =>
+          prev.map((m) => (m.id === botMsgId ? { ...m, text: fullText } : m))
+        );
+        messagesRef.current = messagesRef.current.map((m) =>
+          m.id === botMsgId ? { ...m, text: fullText } : m
+        );
+        setStreamingMessageId(null);
+        cancelStreamingRef.current = null;
+        if (isAutoSpeak) {
+          playMessageAudio(botMsgId, fullText, currentLang);
+        }
+      };
+
+      const streamNext = () => {
+        if (isCancelled) return;
+        if (currentIdx >= chunks.length) {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === botMsgId ? { ...m, text: fullText } : m))
+          );
+          messagesRef.current = messagesRef.current.map((m) =>
+            m.id === botMsgId ? { ...m, text: fullText } : m
+          );
+          setStreamingMessageId(null);
+          cancelStreamingRef.current = null;
+          if (isAutoSpeak) {
+            playMessageAudio(botMsgId, fullText, currentLang);
+          }
+          return;
+        }
+
+        accumulatedText += chunks[currentIdx];
+        currentIdx++;
+        if (currentIdx < chunks.length && chunks[currentIdx].trim() === '') {
+          accumulatedText += chunks[currentIdx];
+          currentIdx++;
+        }
+
+        setMessages((prev) =>
+          prev.map((m) => (m.id === botMsgId ? { ...m, text: accumulatedText } : m))
+        );
+
+        // Natural human-like typewriter cadence: 18 to 26ms per chunk
+        const delay = Math.floor(Math.random() * 8) + 18;
+        streamingTimeoutRef.current = setTimeout(streamNext, delay);
+      };
+
+      // Micro-pause before typewriter starts so the transition from thinking to typing is perceptible and pleasant
+      streamingTimeoutRef.current = setTimeout(streamNext, 40);
+
     } catch {
+      clearTimeout(statusTimer1);
+      clearTimeout(statusTimer2);
+      clearTimeout(statusTimer3);
+      setIsTyping(false);
+
+      const fallbackReplies: Record<'en' | 'mr' | 'hi', string> = {
+        mr: "### 🏛️ महाराष्ट्र एक खिडकी प्रणाली\n\nआपण आपल्या सर्व परवानग्या आणि अनुदानांचे मूल्यांकन करण्यासाठी **प्रकल्प मूल्यमापन** (`/assess`) वापरू शकता, किंवा वरील **थेट अधिकारी (Live Officer)** टॅबद्वारे उद्योग संचालनालयाच्या अधिकाऱ्यांशी संपर्क साधू शकता.",
+        hi: "### 🏛️ महाराष्ट्र एकल खिड़की प्रणाली\n\nआप अपनी सभी स्वीकृतियों और प्रोत्साहनों का मूल्यांकन करने के लिए **परियोजना मूल्यांकन** (`/assess`) का उपयोग कर सकते हैं, या ऊपर **लाइव अधिकारी** टैब के माध्यम से सीधे संपर्क कर सकते हैं।",
+        en: "### 🏛️ Maharashtra Single Window System\n\nYou can use the **Project Assessment** page (`/assess`) to evaluate all your approvals and incentives, or use the **Live Agent** tab above to connect with a Single Window Officer.",
+      };
+
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
           sender: 'bot',
-          text:
-            "### 🏛️ Maharashtra Single Window System\n\n" +
-            "You can use the **Project Assessment** page (`/assess`) to evaluate all your approvals and incentives, or use the **Live Agent** tab above to connect with a Single Window Officer.",
+          text: fallbackReplies[currentLang] || fallbackReplies.en,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           action_links: [
-            { label: 'Start Project Assessment', url: '/assess' },
-            { label: 'View Incentives', url: '/incentives' },
+            { label: currentLang === 'mr' ? 'प्रकल्प मूल्यमापन सुरू करा' : currentLang === 'hi' ? 'परियोजना मूल्यांकन प्रारंभ करें' : 'Start Project Assessment', url: '/assess' },
+            { label: currentLang === 'mr' ? 'प्रोत्साहने पहा' : currentLang === 'hi' ? 'प्रोत्साहन देखें' : 'View Incentives', url: '/incentives' },
           ],
         },
       ]);
-    } finally {
-      setIsTyping(false);
     }
   };
 
@@ -527,15 +1090,22 @@ export default function AiSupportWidget() {
   };
 
   const handleClearChat = () => {
-    setMessages([
+    const activeLanguage = (audioLang || lang || 'en') as 'en' | 'mr' | 'hi';
+    const welcomeConfig = WELCOME_MESSAGES[activeLanguage] || WELCOME_MESSAGES.en;
+    const freshWelcome: ChatMessage[] = [
       {
         id: 'welcome',
         sender: 'bot',
-        text: '### 🏛️ Chat History Cleared\n\nNamaskar! How can I assist you today? Select any prompt below or type your question.',
+        text: welcomeConfig.text,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        suggested_questions: ['How do I assess my project?', 'What subsidies under PSI-2019?'],
+        suggested_questions: welcomeConfig.suggested_questions,
       },
-    ]);
+    ];
+    setMessages(freshWelcome);
+    messagesRef.current = freshWelcome;
+    try {
+      localStorage.setItem('smsws_chat_messages', JSON.stringify(freshWelcome));
+    } catch (e) {}
   };
 
   return (
@@ -543,7 +1113,7 @@ export default function AiSupportWidget() {
       {/* Floating Trigger Button */}
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => handleToggleOpen(true)}
           className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 text-white font-bold text-xs rounded-full shadow-2xl hover:scale-105 hover:shadow-blue-500/25 transition-all cursor-pointer border border-blue-400/40 group"
         >
           <div className="relative flex items-center justify-center">
@@ -590,16 +1160,30 @@ export default function AiSupportWidget() {
 
             <div className="flex items-center gap-1.5">
               {activeTab === 'ai' && (
-                <button
-                  onClick={handleClearChat}
-                  title="Clear chat history"
-                  className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer text-[10px]"
-                >
-                  🔄
-                </button>
+                <>
+                  <button
+                    onClick={() => setShowKeyModal(!showKeyModal)}
+                    title={customApiKey ? "Google Gemini LLM key active" : "Configure Google Gemini API Key"}
+                    className={`px-2 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer border ${
+                      customApiKey
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                        : 'bg-white/10 hover:bg-white/20 text-slate-300 border-white/10'
+                    }`}
+                  >
+                    <span>✨ AI</span>
+                    {customApiKey && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+                  </button>
+                  <button
+                    onClick={handleClearChat}
+                    title="Clear chat history"
+                    className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer text-[10px]"
+                  >
+                    🔄
+                  </button>
+                </>
               )}
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => handleToggleOpen(false)}
                 className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
                 aria-label="Close Support Hub"
               >
@@ -610,10 +1194,70 @@ export default function AiSupportWidget() {
             </div>
           </div>
 
+          {/* AI Settings Popover Modal */}
+          {showKeyModal && (
+            <div className="p-3 bg-gradient-to-b from-slate-900 to-indigo-950 text-white border-b border-indigo-800 text-xs shrink-0 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="font-extrabold flex items-center gap-1.5 text-amber-300 text-[11px]">
+                  <span>✨ Real AI Engine Settings</span>
+                </span>
+                <button
+                  onClick={() => setShowKeyModal(false)}
+                  className="text-slate-400 hover:text-white text-[11px] font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+              <p className="text-[10px] text-slate-300 mb-2 leading-relaxed">
+                The bot runs our <strong>Autonomous Policy AI</strong> by default. To connect live <strong>Google Gemini 2.5 Flash LLM</strong>, enter your Gemini API key from Google AI Studio:
+              </p>
+              <div className="flex gap-1.5">
+                <input
+                  type="password"
+                  value={tempApiKey}
+                  onChange={(e) => setTempApiKey(e.target.value)}
+                  placeholder="AIzaSy... (Gemini API Key)"
+                  className="flex-1 bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                />
+                <button
+                  onClick={() => {
+                    setCustomApiKey(tempApiKey.trim());
+                    if (tempApiKey.trim()) {
+                      localStorage.setItem('smsws_gemini_key', tempApiKey.trim());
+                    } else {
+                      localStorage.removeItem('smsws_gemini_key');
+                    }
+                    setShowKeyModal(false);
+                  }}
+                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shrink-0"
+                >
+                  Save
+                </button>
+                {customApiKey && (
+                  <button
+                    onClick={() => {
+                      setCustomApiKey('');
+                      setTempApiKey('');
+                      localStorage.removeItem('smsws_gemini_key');
+                    }}
+                    className="px-2 py-1 bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 font-semibold rounded-lg text-[10px] transition-colors cursor-pointer shrink-0"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+              {customApiKey && (
+                <div className="mt-1.5 text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                  <span>✓ Live Gemini 2.5 Flash LLM active</span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Tab Navigation */}
           <div className="flex bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-600 shrink-0">
             <button
-              onClick={() => setActiveTab('ai')}
+              onClick={() => handleTabChange('ai')}
               className={`flex-1 py-2.5 text-center transition-colors border-b-2 flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'ai' ? 'border-blue-600 text-blue-700 bg-white' : 'border-transparent hover:text-slate-900'
               }`}
@@ -624,7 +1268,7 @@ export default function AiSupportWidget() {
               <span>AI Policy Bot</span>
             </button>
             <button
-              onClick={() => setActiveTab('live')}
+              onClick={() => handleTabChange('live')}
               className={`flex-1 py-2.5 text-center transition-colors border-b-2 flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'live' ? 'border-blue-600 text-blue-700 bg-white' : 'border-transparent hover:text-slate-900'
               }`}
@@ -643,7 +1287,7 @@ export default function AiSupportWidget() {
               </span>
             </button>
             <button
-              onClick={() => setActiveTab('helpline')}
+              onClick={() => handleTabChange('helpline')}
               className={`flex-1 py-2.5 text-center transition-colors border-b-2 flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'helpline' ? 'border-blue-600 text-blue-700 bg-white' : 'border-transparent hover:text-slate-900'
               }`}
@@ -665,13 +1309,79 @@ export default function AiSupportWidget() {
              ══════════════════════════════════════════════════════════════════ */}
           {activeTab === 'ai' && (
             <div className="flex-1 flex flex-col bg-slate-50 min-h-0">
+              {/* Audio Toolbar: 3 Languages (English, Marathi, Hindi) & Auto-Speak */}
+              <div className="px-3 py-1.5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex items-center justify-between text-[11px] border-b border-indigo-900/60 shrink-0 shadow-2xs">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-[10px] text-indigo-300 flex items-center gap-1">
+                    <span>🔊 Audio:</span>
+                  </span>
+                  <div className="flex items-center bg-white/10 rounded-lg p-0.5 border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchLanguage('en')}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                        audioLang === 'en'
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'text-slate-300 hover:text-white'
+                      }`}
+                      title="English voice narration"
+                    >
+                      English
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchLanguage('mr')}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                        audioLang === 'mr'
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'text-slate-300 hover:text-white'
+                      }`}
+                      title="मराठी (Marathi) voice narration"
+                    >
+                      मराठी (MR)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchLanguage('hi')}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                        audioLang === 'hi'
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'text-slate-300 hover:text-white'
+                      }`}
+                      title="हिंदी (Hindi) voice narration"
+                    >
+                      हिंदी (HI)
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !isAutoSpeak;
+                    setIsAutoSpeak(next);
+                    if (!next) stopAudio();
+                  }}
+                  className={`px-2 py-0.5 rounded-full text-[9px] font-bold transition-all flex items-center gap-1 cursor-pointer border ${
+                    isAutoSpeak
+                      ? 'bg-emerald-500/25 text-emerald-300 border-emerald-400/50'
+                      : 'bg-white/10 text-slate-400 border-white/10 hover:text-white'
+                  }`}
+                  title={isAutoSpeak ? "Auto-speak enabled: Reads new replies aloud" : "Click to auto-speak replies"}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${isAutoSpeak ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
+                  <span>{isAutoSpeak ? 'Auto-Voice: ON' : 'Auto-Voice: OFF'}</span>
+                </button>
+              </div>
+
               {/* Categorized Quick Prompts Bar */}
               <div className="p-2 bg-slate-100 border-b border-slate-200 overflow-x-auto whitespace-nowrap scrollbar-none flex gap-1 shrink-0">
-                {QUICK_PROMPTS_CATEGORIES.flatMap((c) => c.items).map((q, idx) => (
+                {(QUICK_PROMPTS_CATEGORIES_BY_LANG[audioLang] || QUICK_PROMPTS_CATEGORIES_BY_LANG.en).flatMap((c) => c.items).map((q, idx) => (
                   <button
                     key={idx}
+                    disabled={isTyping || !!streamingMessageId}
                     onClick={() => handleBotQuery(q)}
-                    className="text-[10px] font-semibold bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 px-2.5 py-1 rounded-full border border-slate-300 shadow-2xs transition-colors shrink-0 cursor-pointer"
+                    className="text-[10px] font-semibold bg-white hover:bg-blue-50 disabled:opacity-50 text-slate-700 hover:text-blue-700 px-2.5 py-1 rounded-full border border-slate-300 shadow-2xs transition-colors shrink-0 cursor-pointer"
                   >
                     {q}
                   </button>
@@ -680,97 +1390,155 @@ export default function AiSupportWidget() {
 
               {/* Chat Messages */}
               <div className="flex-1 p-3.5 overflow-y-auto space-y-3.5 text-xs min-h-0">
-                {messages.map((m) => (
-                  <div key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                {messages.map((m) => {
+                  const isStreamingThis = m.id === streamingMessageId;
+                  return (
                     <div
-                      className={`max-w-[90%] rounded-2xl px-3.5 py-3 shadow-xs ${
-                        m.sender === 'user'
-                          ? 'bg-blue-600 text-white rounded-br-none'
-                          : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none'
+                      key={m.id}
+                      className={`flex transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${
+                        m.sender === 'user' ? 'justify-end' : 'justify-start'
                       }`}
                     >
-                      {/* Message Content rendered cleanly */}
-                      <FormattedText text={m.text} />
-
-                      {/* Action Links (e.g. Go to Project Assessment) */}
-                      {m.action_links && m.action_links.length > 0 && (
-                        <div className="mt-2.5 pt-2 border-t border-slate-100 flex flex-wrap gap-1.5">
-                          {m.action_links.map((link, lIdx) => (
-                            <Link
-                              key={lIdx}
-                              href={link.url}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-[10px] font-bold border border-blue-200 transition-colors"
-                            >
-                              <span>{link.label}</span>
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Functional Bar: Copy Answer & Transfer to Live Officer */}
-                      {m.sender === 'bot' && m.id !== 'welcome' && (
-                        <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
-                          <button
-                            onClick={() => handleTransferToLiveOfficer(m)}
-                            className="text-amber-700 hover:text-amber-800 font-extrabold flex items-center gap-1 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded border border-amber-200 transition-colors cursor-pointer"
-                          >
-                            <span>👨‍💼 Ask a Live Officer About This →</span>
-                          </button>
-
-                          <button
-                            onClick={() => handleCopyAnswer(m.id, m.text)}
-                            className="text-slate-400 hover:text-slate-700 font-semibold flex items-center gap-1 cursor-pointer"
-                          >
-                            {copiedId === m.id ? (
-                              <span className="text-emerald-600 font-bold">✓ Copied</span>
-                            ) : (
-                              <span>📋 Copy</span>
-                            )}
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Follow-up Question Suggestions */}
-                      {m.suggested_questions && m.suggested_questions.length > 0 && (
-                        <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
-                            Suggested Follow-Ups:
-                          </span>
-                          <div className="flex flex-wrap gap-1">
-                            {m.suggested_questions.map((sq, sqIdx) => (
-                              <button
-                                key={sqIdx}
-                                onClick={() => handleBotQuery(sq)}
-                                className="text-[10px] text-slate-600 hover:text-blue-700 bg-slate-50 hover:bg-blue-50 px-2 py-0.5 rounded border border-slate-200 transition-colors text-left cursor-pointer"
-                              >
-                                • {sq}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <span
-                        className={`text-[9px] block mt-1.5 ${
-                          m.sender === 'user' ? 'text-blue-200 text-right' : 'text-slate-400'
+                      <div
+                        className={`max-w-[90%] rounded-2xl px-3.5 py-3 shadow-xs relative transition-all ${
+                          m.sender === 'user'
+                            ? 'bg-blue-600 text-white rounded-br-none'
+                            : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none'
                         }`}
                       >
-                        {m.timestamp}
-                      </span>
+                        {/* Skip button while streaming */}
+                        {isStreamingThis && (
+                          <div className="flex justify-end mb-1">
+                            <button
+                              onClick={() => cancelStreamingRef.current?.()}
+                              className="text-[9px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-blue-200 cursor-pointer flex items-center gap-1 transition-colors"
+                              title="Skip animation and display full response"
+                            >
+                              <span>⚡ Skip</span>
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Message Content rendered cleanly */}
+                        <div>
+                          <FormattedText text={m.text} />
+                          {isStreamingThis && (
+                            <span className="inline-block w-1.5 h-3.5 bg-blue-600 ml-1 animate-pulse align-middle" />
+                          )}
+                        </div>
+
+                        {/* Action Links (e.g. Go to Project Assessment) */}
+                        {!isStreamingThis && m.action_links && m.action_links.length > 0 && (
+                          <div className="mt-2.5 pt-2 border-t border-slate-100 flex flex-wrap gap-1.5 animate-in fade-in duration-300">
+                            {m.action_links.map((link, lIdx) => (
+                              <Link
+                                key={lIdx}
+                                href={link.url}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-[10px] font-bold border border-blue-200 transition-colors"
+                              >
+                                <span>{link.label}</span>
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Functional Bar: Voice Audio Narration, Copy & Transfer to Live Officer */}
+                        {!isStreamingThis && m.sender === 'bot' && (
+                          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] animate-in fade-in duration-300 gap-1.5 flex-wrap">
+                            <div className="flex items-center gap-1.5">
+                              {/* Audio Voice Narration Button */}
+                              <button
+                                type="button"
+                                onClick={() => playMessageAudio(m.id, m.text)}
+                                className={`font-extrabold flex items-center gap-1 px-2 py-0.5 rounded border transition-colors cursor-pointer text-[10px] ${
+                                  speakingMessageId === m.id
+                                    ? 'bg-rose-50 text-rose-700 border-rose-300 animate-pulse'
+                                    : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200'
+                                }`}
+                                title={speakingMessageId === m.id ? "Stop voice narration" : `Listen to guidance in ${audioLang === 'mr' ? 'मराठी' : audioLang === 'hi' ? 'हिंदी' : 'English'}`}
+                              >
+                                {speakingMessageId === m.id ? (
+                                  <>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-ping" />
+                                    <span>⏹️ Stop Voice</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>🔊 Listen ({audioLang.toUpperCase()})</span>
+                                  </>
+                                )}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleCopyAnswer(m.id, m.text)}
+                                className="text-slate-400 hover:text-slate-700 font-semibold flex items-center gap-1 cursor-pointer bg-slate-50 hover:bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200"
+                              >
+                                {copiedId === m.id ? (
+                                  <span className="text-emerald-600 font-bold">✓ Copied</span>
+                                ) : (
+                                  <span>📋 Copy</span>
+                                )}
+                              </button>
+                            </div>
+
+                            {m.id !== 'welcome' && (
+                              <button
+                                type="button"
+                                onClick={() => handleTransferToLiveOfficer(m)}
+                                className="text-amber-700 hover:text-amber-800 font-extrabold flex items-center gap-1 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded border border-amber-200 transition-colors cursor-pointer"
+                              >
+                                <span>👨‍💼 Ask Officer →</span>
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Follow-up Question Suggestions */}
+                        {!isStreamingThis && m.suggested_questions && m.suggested_questions.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-slate-100 space-y-1 animate-in fade-in duration-300">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                              Suggested Follow-Ups:
+                            </span>
+                            <div className="flex flex-wrap gap-1">
+                              {m.suggested_questions.map((sq, sqIdx) => (
+                                <button
+                                  key={sqIdx}
+                                  onClick={() => handleBotQuery(sq)}
+                                  disabled={isTyping || !!streamingMessageId}
+                                  className="text-[10px] text-slate-600 hover:text-blue-700 bg-slate-50 hover:bg-blue-50 disabled:opacity-50 px-2 py-0.5 rounded border border-slate-200 transition-colors text-left cursor-pointer"
+                                >
+                                  • {sq}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <span
+                          className={`text-[9px] block mt-1.5 ${
+                            m.sender === 'user' ? 'text-blue-200 text-right' : 'text-slate-400'
+                          }`}
+                        >
+                          {m.timestamp}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 {isTyping && (
-                  <div className="flex justify-start">
-                    <div className="bg-white border border-slate-200 rounded-2xl px-3.5 py-2 text-slate-400 text-xs italic flex items-center gap-1.5 shadow-2xs">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" />
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce delay-100" />
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce delay-200" />
-                      <span className="ml-1 text-[10px] text-slate-500 font-semibold">Consulting Maharashtra Gazettes...</span>
+                  <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-200">
+                    <div className="bg-white border border-blue-200 rounded-2xl px-3.5 py-2.5 text-slate-700 text-xs flex items-center gap-2 shadow-xs">
+                      <div className="flex items-center gap-1">
+                        <span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" />
+                        <span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:150ms]" />
+                        <span className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:300ms]" />
+                      </div>
+                      <span className="ml-1 text-[11px] text-blue-900 font-semibold">{typingStatus}</span>
                     </div>
                   </div>
                 )}
@@ -778,28 +1546,71 @@ export default function AiSupportWidget() {
               </div>
 
               {/* Bot Input Form */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleBotQuery(input);
-                }}
-                className="p-2.5 bg-white border-t border-slate-200 flex gap-2 shrink-0"
-              >
-                <input
-                  type="text"
-                  placeholder="Ask any question about Maharashtra policy, forms, or clearances..."
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  className="flex-1 text-xs px-3.5 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 text-slate-800"
-                />
-                <button
-                  type="submit"
-                  disabled={!input.trim() || isTyping}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors shadow-xs shrink-0 cursor-pointer"
+              <div className="bg-white border-t border-slate-200">
+                {isListening && (
+                  <div className="px-3 py-1 bg-rose-50 border-b border-rose-200 flex items-center justify-between text-[10px] text-rose-700 animate-pulse">
+                    <span className="flex items-center gap-1.5 font-bold">
+                      <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
+                      🎙️ Listening in {audioLang === 'mr' ? 'मराठी (Marathi)' : audioLang === 'hi' ? 'हिंदी (Hindi)' : 'English'}... Speak now!
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleSpeechRecognition()}
+                      className="font-bold underline cursor-pointer hover:text-rose-900"
+                    >
+                      Stop
+                    </button>
+                  </div>
+                )}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleBotQuery(input);
+                  }}
+                  className="p-2.5 flex gap-2 shrink-0 items-center"
                 >
-                  Send
-                </button>
-              </form>
+                  <button
+                    type="button"
+                    onClick={toggleSpeechRecognition}
+                    title={isListening ? "Listening... click to stop" : `Voice input in ${audioLang === 'mr' ? 'Marathi' : audioLang === 'hi' ? 'Hindi' : 'English'}`}
+                    className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0 ${
+                      isListening
+                        ? 'bg-rose-600 text-white animate-pulse shadow-md ring-2 ring-rose-400'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-blue-600 border border-slate-300'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                  </button>
+
+                  <input
+                    type="text"
+                    placeholder={
+                      isTyping || !!streamingMessageId
+                        ? (audioLang === 'mr' ? 'AI धोरण मार्गदर्शन तयार करत आहे...' : audioLang === 'hi' ? 'AI नीति मार्गदर्शन तैयार कर रहा है...' : 'AI is formulating policy guidance...')
+                        : isListening
+                        ? (audioLang === 'mr' ? 'मराठी आवाजी इनपुट ऐकत आहे... बोला!' : audioLang === 'hi' ? 'हिंदी वॉयस इनपुट सुन रहा हूँ... बोलिए!' : 'Listening to English voice input... Speak now!')
+                        : (audioLang === 'mr' ? 'महाराष्ट्र औद्योगिक धोरणे, अर्ज किंवा परवानग्यांबद्दल विचारा (किंवा 🎙️ दाबा)...' : audioLang === 'hi' ? 'महाराष्ट्र औद्योगिक नीतियों, फॉर्म या स्वीकृतियों के बारे में पूछें (या 🎙️ दबाएं)...' : 'Ask about policy, forms, or clearances (or click 🎙️ to speak)...')
+                    }
+                    value={input}
+                    disabled={isTyping || !!streamingMessageId}
+                    onChange={(e) => setInput(e.target.value)}
+                    className="flex-1 text-xs px-3.5 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 text-slate-800 disabled:opacity-60"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!input.trim() || isTyping || !!streamingMessageId}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors shadow-xs shrink-0 cursor-pointer"
+                  >
+                    {isTyping
+                      ? (audioLang === 'mr' ? 'विचार करत आहे...' : audioLang === 'hi' ? 'सोच रहा हूँ...' : 'Thinking...')
+                      : streamingMessageId
+                      ? (audioLang === 'mr' ? 'टाइप करत आहे...' : audioLang === 'hi' ? 'टाइप कर रहा हूँ...' : 'Typing...')
+                      : (audioLang === 'mr' ? 'पाठवा' : audioLang === 'hi' ? 'भेजें' : 'Send')}
+                  </button>
+                </form>
+              </div>
             </div>
           )}
 
