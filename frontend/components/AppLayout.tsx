@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import AiSupportWidget from '@/components/AiSupportWidget';
 import { useLanguage } from '@/context/LanguageContext';
+import { deleteAccount } from '@/lib/api';
 
 interface User {
+  user_id?: number;
   username: string;
   name: string;
   role: string;
@@ -121,15 +123,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (savedFontSize === 'small' || savedFontSize === 'normal' || savedFontSize === 'large') {
       setFontSize(savedFontSize as 'small' | 'normal' | 'large');
       if (typeof document !== 'undefined') {
-        if (savedFontSize === 'small') document.documentElement.style.fontSize = '100%';
-        else if (savedFontSize === 'normal') document.documentElement.style.fontSize = '112.5%';
-        else if (savedFontSize === 'large') document.documentElement.style.fontSize = '125%';
+        if (savedFontSize === 'small') document.documentElement.style.fontSize = '90%';
+        else if (savedFontSize === 'normal') document.documentElement.style.fontSize = '100%';
+        else if (savedFontSize === 'large') document.documentElement.style.fontSize = '115%';
       }
     } else {
       setFontSize('normal');
       localStorage.setItem('smsws_font_size_v2', 'normal');
       if (typeof document !== 'undefined') {
-        document.documentElement.style.fontSize = '112.5%';
+        document.documentElement.style.fontSize = '100%';
       }
     }
   }, [pathname, router]);
@@ -138,9 +140,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     setFontSize(size);
     localStorage.setItem('smsws_font_size_v2', size);
     if (typeof document !== 'undefined') {
-      if (size === 'small') document.documentElement.style.fontSize = '100%';
-      else if (size === 'normal') document.documentElement.style.fontSize = '112.5%';
-      else if (size === 'large') document.documentElement.style.fontSize = '125%';
+      if (size === 'small') document.documentElement.style.fontSize = '90%';
+      else if (size === 'normal') document.documentElement.style.fontSize = '100%';
+      else if (size === 'large') document.documentElement.style.fontSize = '115%';
     }
   }
 
@@ -153,6 +155,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   function handleLogout() {
     localStorage.removeItem('smsws_user');
     router.replace('/login');
+  }
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDeleteAccount() {
+    if (!user) return;
+    setDeleting(true);
+    try {
+      if (user.user_id) {
+        await deleteAccount(user.user_id);
+      }
+      localStorage.removeItem('smsws_user');
+      localStorage.removeItem('smsws_profile');
+      localStorage.removeItem('smsws_assessment');
+      localStorage.removeItem('smsws_demo');
+      setShowDeleteModal(false);
+      router.replace('/login');
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete account');
+      setDeleting(false);
+    }
   }
 
   return (
@@ -248,10 +272,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Top Header */}
       <header className="w-full bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md print:hidden">
-        <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-6 lg:px-8 min-h-[4.25rem] py-2 flex items-center justify-between gap-4">
           
           {/* Brand & Desktop Collapse Toggle */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -270,7 +294,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {/* Desktop Sidebar Collapse Toggle Button */}
             <button
               onClick={toggleSidebarCollapse}
-              className="hidden md:flex items-center justify-center p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+              className="hidden md:flex items-center justify-center p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors shrink-0"
               title={sidebarCollapsed ? "Expand sidebar menu" : "Collapse sidebar menu"}
             >
               <svg className={`w-4 h-4 transition-transform duration-200 ${sidebarCollapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,7 +304,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
             <Link href="/" className="flex items-center gap-3 group">
               {/* Official Maharashtra State Emblem */}
-              <div className="w-10 h-10 rounded-lg bg-white/10 p-0.5 border border-slate-700/80 flex items-center justify-center shrink-0 shadow-inner group-hover:border-amber-400/50 transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-white/10 p-1 border border-slate-700/80 flex items-center justify-center shrink-0 shadow-inner group-hover:border-amber-400/50 transition-colors">
                 <img
                   src="/maharashtra-emblem.png"
                   alt="Government of Maharashtra State Emblem"
@@ -290,14 +314,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
               <div className="flex flex-col justify-center">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm sm:text-base uppercase font-extrabold tracking-wider text-slate-300">
+                  <span className="text-[11px] sm:text-xs uppercase font-extrabold tracking-wider text-slate-300 whitespace-nowrap">
                     {t('gov.name', 'Government of Maharashtra')}
                   </span>
-                  <span className="hidden sm:inline-block text-[10px] font-mono bg-slate-800 text-amber-300 px-2 py-0.5 rounded border border-slate-700">
+                  <span className="hidden sm:inline-block text-[10px] font-mono bg-slate-800 text-amber-300 px-2 py-0.5 rounded border border-slate-700 whitespace-nowrap shrink-0">
                     {t('maitri.single_window', 'MAITRI Single Window')}
                   </span>
                 </div>
-                <span className="text-white font-black text-lg sm:text-xl tracking-tight leading-none group-hover:text-slate-100 transition-colors">
+                <span className="text-white font-black text-sm sm:text-base tracking-tight leading-snug group-hover:text-slate-100 transition-colors whitespace-nowrap">
                   {t('portal.name', 'Unified Industrial Approval System')}
                 </span>
               </div>
@@ -305,11 +329,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Right Top Header Actions */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 shrink-0">
             {/* Quick Demo CTA */}
             <Link
               href="/assess?demo=textile"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors shadow-xs whitespace-nowrap shrink-0"
             >
               <span>{t('try.demo', 'Try Demo Project')}</span>
             </Link>
@@ -318,26 +342,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {hasAssessment && (
               <Link
                 href="/results"
-                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-xs font-semibold hover:text-white transition-colors"
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-xs font-semibold hover:text-white transition-colors whitespace-nowrap shrink-0"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
                 <span>{t('active.report', 'Active Report')}</span>
               </Link>
             )}
 
             {/* User Session Profile & Logout */}
-            <div className="flex items-center gap-2.5 pl-3 border-l border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 font-bold text-xs">
+            <div className="flex items-center gap-2.5 pl-3 border-l border-slate-800 shrink-0">
+              <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 font-bold text-xs shrink-0">
                 {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
               </div>
-              <div className="hidden md:flex flex-col text-right leading-none">
-                <span className="text-xs font-bold text-slate-200">{user?.name || 'Applicant'}</span>
-                <span className="text-[11px] text-slate-400 mt-0.5">{user?.role || 'Enterprise User'}</span>
+              <div className="hidden md:flex flex-col text-right leading-tight max-w-[150px] sm:max-w-[200px]">
+                <span className="text-xs font-bold text-slate-200 truncate" title={user?.name}>{user?.name || 'Applicant'}</span>
+                <span className="text-[11px] text-slate-400 truncate">{user?.role || 'Enterprise User'}</span>
               </div>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="ml-1 text-xs text-slate-400 hover:text-rose-300 px-2.5 py-1.5 rounded-lg hover:bg-slate-800 transition-colors font-medium"
+                className="ml-1 text-xs text-slate-400 hover:text-rose-300 px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors font-medium whitespace-nowrap shrink-0 cursor-pointer"
                 title="Sign out of portal"
               >
                 {t('nav.signout', 'Sign out')}
@@ -448,6 +472,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <p>• 186 {t('res.forms_tab', 'Forms')}</p>
                 </div>
               </div>
+
+              {/* Danger Zone / Delete Account in Sidebar */}
+              <div className={`pt-2.5 px-2 mt-2 border-t border-slate-800/60 ${
+                sidebarCollapsed ? 'hidden group-hover:block' : 'block'
+              }`}>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(true)}
+                  className="w-full flex items-center gap-2 py-1.5 px-2 rounded-lg text-xs text-slate-400 hover:text-rose-400 hover:bg-slate-800/60 transition-colors text-left cursor-pointer"
+                  title="Delete this account and all associated assessment records"
+                >
+                  <svg className="w-3.5 h-3.5 text-rose-500/70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Delete Account</span>
+                </button>
+              </div>
             </div>
           </aside>
         </div>
@@ -477,6 +518,48 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <p className="text-slate-400">{t('footer.rule_engine', 'Deterministic Rule Engine · Grounded in Verified State Gazettes & MAITRI Rules')}</p>
         </div>
       </footer>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900">Delete Account</h3>
+                <p className="text-xs text-slate-500">Permanent and irreversible action</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Are you sure you want to delete the account for <strong className="text-slate-900">{user?.name || user?.username}</strong>? All company project details and regulatory assessment records will be permanently removed.
+            </p>
+
+            <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleting}
+                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleting}
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 rounded-xl transition-colors shadow-sm cursor-pointer flex items-center gap-1.5"
+              >
+                {deleting ? 'Deleting…' : 'Yes, Delete Account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating AI Support & Live Agent Widget */}
       <AiSupportWidget />

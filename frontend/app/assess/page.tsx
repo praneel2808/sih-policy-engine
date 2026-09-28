@@ -6,7 +6,7 @@ import Link from 'next/link';
 import AppLayout from '@/components/AppLayout';
 import type { ApplicantProfile, EntityType, Sector, LocationType, ProjectStage } from '@/types';
 import { DEMO_TEXTILE, DEMO_EV } from '@/types';
-import { submitAssessment, DISTRICTS } from '@/lib/api';
+import { submitAssessment, DISTRICTS, updateProfile } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
 
 const ENTITY_TYPES: EntityType[] = ['Company', 'LLP', 'Proprietorship'];
@@ -536,6 +536,18 @@ function AssessInner() {
       setProfile(DEMO_EV);
       setIsDemoMode(true);
       setShowAdvanced(true);
+    } else {
+      const savedProfile = localStorage.getItem('smsws_profile');
+      if (savedProfile) {
+        try {
+          const parsed = JSON.parse(savedProfile);
+          if (parsed && parsed.entity_name) {
+            setProfile(parsed);
+          }
+        } catch {
+          // ignore
+        }
+      }
     }
   }, [searchParams]);
 
@@ -634,6 +646,18 @@ function AssessInner() {
       localStorage.setItem('smsws_assessment', JSON.stringify(result));
       localStorage.setItem('smsws_profile', JSON.stringify(profile));
       localStorage.setItem('smsws_demo', isDemoMode ? '1' : '0');
+      
+      // Also persist to backend if user is logged in
+      const userRaw = localStorage.getItem('smsws_user');
+      if (userRaw) {
+        try {
+          const user = JSON.parse(userRaw);
+          if (user.user_id) {
+            await updateProfile(user.user_id, profile as Record<string, any>);
+          }
+        } catch { /* non-critical */ }
+      }
+      
       router.push('/results');
     } catch (err: unknown) {
       setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please check API server.');

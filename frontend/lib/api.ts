@@ -148,3 +148,88 @@ export const DISTRICTS = [
   "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara",
   "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal",
 ];
+
+export async function registerUser(data: {
+  username: string;
+  password: string;
+  entity_type: string;
+  entity_name: string;
+  sector: string;
+  stage: string;
+  district?: string;
+  investment_inr?: number;
+  employment_expected?: number;
+  location_type?: string;
+  nic_code?: string;
+  pan?: string;
+  product_description?: string;
+  taluka?: string;
+  power_kw?: number;
+  is_export_oriented?: boolean;
+  women_led_enterprise?: boolean;
+  student_led_enterprise?: boolean;
+}): Promise<{ user_id: number; username: string; entity_name: string; assessment: AssessmentResponse }> {
+  const res = await fetch(`${API_BASE}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(typeof err.detail === 'string' ? err.detail : 'Registration failed');
+  }
+  return res.json();
+}
+
+export async function loginUser(username: string, password: string): Promise<{
+  user_id: number;
+  username: string;
+  entity_name: string;
+  profile: Record<string, any>;
+  assessment: AssessmentResponse | null;
+}> {
+  const res = await fetch(`${API_BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(typeof err.detail === 'string' ? err.detail : 'Login failed');
+  }
+  return res.json();
+}
+
+export async function updateProfile(userId: number, data: Record<string, any>): Promise<{
+  user_id: number;
+  profile: Record<string, any>;
+  assessment: AssessmentResponse;
+}> {
+  const res = await fetch(`${API_BASE}/api/auth/profile/${userId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(typeof err.detail === 'string' ? err.detail : 'Profile update failed');
+  }
+  return res.json();
+}
+
+export async function getUserAssessment(userId: number): Promise<{ assessment: AssessmentResponse | null }> {
+  const res = await fetch(`${API_BASE}/api/auth/assessment/${userId}`);
+  if (!res.ok) throw new Error('Could not load assessment');
+  return res.json();
+}
+
+export async function deleteAccount(userId: number): Promise<{ status: string; message: string }> {
+  const res = await fetch(`${API_BASE}/api/auth/account/${userId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(typeof err.detail === 'string' ? err.detail : 'Failed to delete account');
+  }
+  return res.json();
+}

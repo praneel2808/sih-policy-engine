@@ -253,12 +253,20 @@ export default function DashboardHome() {
                 </p>
               </div>
 
-              <Link
-                href="/results"
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-xl transition-colors self-start md:self-auto shadow-sm"
-              >
-                {t('dash.view_report', 'View Assessment Report →')}
-              </Link>
+              <div className="flex flex-col sm:flex-row items-center gap-2 self-start md:self-auto">
+                <Link
+                  href="/assess"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm rounded-xl transition-colors shadow-sm text-center w-full sm:w-auto"
+                >
+                  Edit Company Details & Re-run Assessment
+                </Link>
+                <Link
+                  href="/results"
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-xl transition-colors shadow-sm text-center w-full sm:w-auto"
+                >
+                  {t('dash.view_report', 'View Assessment Report →')}
+                </Link>
+              </div>
             </div>
 
             {/* Assessment Metrics */}
