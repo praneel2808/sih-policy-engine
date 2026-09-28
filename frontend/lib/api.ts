@@ -233,3 +233,155 @@ export async function deleteAccount(userId: number): Promise<{ status: string; m
   }
   return res.json();
 }
+
+// ── Live Support & AI Bot API ────────────────────────────────────────────────
+
+export interface SubmittedFormRecord {
+  submission_id: number;
+  project_id?: string;
+  entity_name: string;
+  form_requirement_id?: number;
+  form_name: string;
+  form_number?: string;
+  status?: string;
+  collected_values: Record<string, any>;
+  created_at: string;
+}
+
+export interface SupportTicket {
+  ticket_id: string;
+  applicant_name: string;
+  entity_name: string;
+  email?: string;
+  phone?: string;
+  district?: string;
+  department: string;
+  subject: string;
+  status: 'PENDING' | 'IN_PROGRESS' | 'RESOLVED';
+  priority: 'NORMAL' | 'HIGH' | 'URGENT';
+  current_stage?: string;
+  sector?: string;
+  investment_inr?: number;
+  project_id?: string;
+  assigned_officer?: string;
+  created_at: string;
+  updated_at: string;
+  message_count?: number;
+  messages?: SupportMessage[];
+  submitted_forms?: SubmittedFormRecord[];
+}
+
+export interface SupportMessage {
+  message_id?: number;
+  ticket_id: string;
+  sender: 'user' | 'officer' | 'system';
+  sender_name: string;
+  sender_title?: string;
+  text: string;
+  attachment_name?: string;
+  attachment_type?: string;
+  attachment_data?: string;
+  attachment_size?: number;
+  created_at: string;
+}
+
+export interface BotResponse {
+  reply: string;
+  action_links?: Array<{ label: string; url: string }>;
+  suggested_questions?: string[];
+  recommended_department?: string;
+  prefill_inquiry?: string;
+}
+
+export async function askSupportBot(query: string, currentPage?: string): Promise<BotResponse> {
+  const res = await fetch(`${API_BASE}/api/support/bot/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, current_page: currentPage }),
+  });
+  if (!res.ok) throw new Error('AI Assistant service unavailable');
+  return res.json();
+}
+
+export async function createSupportTicket(data: {
+  applicant_name: string;
+  entity_name: string;
+  email?: string;
+  phone?: string;
+  district?: string;
+  department: string;
+  subject: string;
+  initial_message: string;
+  priority?: string;
+  current_stage?: string;
+  sector?: string;
+  investment_inr?: number;
+  project_id?: string;
+  attachment_name?: string;
+  attachment_type?: string;
+  attachment_data?: string;
+  attachment_size?: number;
+}): Promise<{ status: string; ticket_id: string; message: string }> {
+  const res = await fetch(`${API_BASE}/api/support/tickets`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(typeof err.detail === 'string' ? err.detail : 'Failed to create support ticket');
+  }
+  return res.json();
+}
+
+export async function getSupportTickets(department?: string, status?: string): Promise<SupportTicket[]> {
+  const params = new URLSearchParams();
+  if (department && department !== 'All') params.set('department', department);
+  if (status && status !== 'All') params.set('status', status);
+  const res = await fetch(`${API_BASE}/api/support/tickets?${params.toString()}`);
+  if (!res.ok) throw new Error('Could not fetch support tickets');
+  return res.json();
+}
+
+export async function getSupportTicketDetail(ticketId: string): Promise<SupportTicket> {
+  const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}`);
+  if (!res.ok) throw new Error('Could not load ticket detail');
+  return res.json();
+}
+
+export async function postTicketMessage(
+  ticketId: string,
+  data: {
+    sender: string;
+    sender_name: string;
+    sender_title?: string;
+    text: string;
+    attachment_name?: string;
+    attachment_type?: string;
+    attachment_data?: string;
+    attachment_size?: number;
+  }
+): Promise<{ status: string; message: string }> {
+  const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}/messages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to send message');
+  return res.json();
+}
+
+export async function updateTicketStatus(
+  ticketId: string,
+  status: string,
+  assignedOfficer?: string
+): Promise<{ status: string; new_status: string }> {
+  const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status, assigned_officer: assignedOfficer }),
+  });
+  if (!res.ok) throw new Error('Failed to update ticket status');
+  return res.json();
+}
+

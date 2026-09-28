@@ -28,6 +28,7 @@ from src.models import (
 from src.assessment import run_assessment
 from src.retrieval import LexicalRetriever
 from src.api.auth import auth_router
+from src.api.support import support_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("smsws.api")
@@ -62,6 +63,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(support_router)
 
 
 

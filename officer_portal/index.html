@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Government of Maharashtra — MAITRI Officer Response Console</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950">
+
+  <!-- TOP OFFICIAL GOVERNMENT HEADER -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/10 p-1.5 border border-slate-700 flex items-center justify-center shrink-0">
+          <img src="http://localhost:3000/maharashtra-emblem.png" alt="State Emblem" class="w-full h-full object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/22/Emblem_of_Maharashtra.svg'" />
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] uppercase font-black tracking-widest text-amber-400 bg-amber-950/80 border border-amber-800/80 px-2 py-0.5 rounded">
+              Government of Maharashtra
+            </span>
+            <span id="headerClock" class="text-xs font-mono text-slate-400"></span>
+            <span class="text-[10px] bg-blue-950 border border-blue-800 text-blue-300 font-mono px-2 py-0.5 rounded">
+              PORT 3001 (OFFICER STATION)
+            </span>
+          </div>
+          <h1 class="text-sm sm:text-base font-black text-white tracking-tight">
+            MAITRI Single Window Citizen Response Console
+          </h1>
+        </div>
+      </div>
+
+      <!-- Logged in Officer Badge / Desk Switcher / Logout -->
+      <div id="officerHeaderProfile" class="flex items-center gap-2 sm:gap-3 hidden">
+        <div class="flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-1.5">
+          <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center font-mono" id="officerAvatar">
+            SD
+          </div>
+          <div class="text-left leading-tight">
+            <span class="text-xs font-extrabold text-white block" id="officerName">Officer Name</span>
+            <span class="text-[10px] text-amber-400 font-medium block" id="officerDept">Department</span>
+          </div>
+        </div>
+
+        <!-- Quick Switch Desk button -->
+        <button onclick="openSwitchDeskModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-600/40 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5" title="Switch Department Desk">
+          <span>🔄</span>
+          <span class="hidden sm:inline">Switch Desk</span>
+        </button>
+
+        <button onclick="logoutOfficer()" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-950/80 hover:border-rose-700 text-slate-300 hover:text-rose-200 border border-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VIEW 1: DEPARTMENT LOGIN SCREEN -->
+  <main id="loginView" class="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 my-auto">
+    <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      
+      <!-- Login Credentials Form (5 cols) -->
+      <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl">
+        <div>
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-4 text-xl">
+            🏛️
+          </div>
+          <h2 class="text-lg font-black text-white tracking-tight">Departmental Officer Sign In</h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Sign in with your designated departmental credentials to access and answer citizen inquiries exclusively for your desk.
+          </p>
+
+          <form id="officerLoginForm" onsubmit="handleFormLogin(event)" class="mt-6 space-y-4">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Officer Username</label>
+              <input type="text" id="loginUsername" required placeholder="e.g. psi.officer or mpcb.officer" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Official Password</label>
+              <input type="password" id="loginPassword" required placeholder="Enter password" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
+
+            <div id="loginError" class="text-xs text-rose-400 bg-rose-950/50 border border-rose-800/80 p-2.5 rounded-xl hidden"></div>
+
+            <button type="submit" id="loginBtn" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+              <span>Sign In to Response Desk →</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-slate-800 text-[10px] text-slate-500 flex items-center justify-between">
+          <span>Protected Single Window Government System</span>
+          <span class="font-mono text-amber-500 font-bold">RTS Act SLA</span>
+        </div>
+      </div>
+
+      <!-- Quick 1-Click Department Selectors (7 cols) -->
+      <div class="lg:col-span-7 bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              Departmental Quick Demo Access
+            </h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">
+              Click any department officer below to immediately sign in and experience strict query isolation:
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 overflow-y-auto max-h-[380px] pr-1">
+          <!-- Card 1: PSI-2019 -->
+          <div onclick="quickLogin('psi.officer', 'psi@123')" class="p-3.5 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/60 rounded-2xl cursor-pointer transition-all group">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-amber-400 font-mono">psi.officer</span>
+              <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.2 rounded">PSI-2019</span>
+            </div>
+            <h4 class="text-xs font-extrabold text-white group-hover:text-amber-300">Shri Sanjay Deshmukh</h4>
+            <span class="text-[10px] text-slate-400 block truncate">Joint Director (Incentives & SGST)</span>
+            <span class="text-[9px] text-slate-500 mt-1 block">🔒 Sees only PSI Subsidy Queries</span>
+          </div>
+
+          <!-- Card 2: MPCB -->
+          <div onclick="quickLogin('mpcb.officer', 'mpcb@123')" class="p-3.5 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/60 rounded-2xl cursor-pointer transition-all group">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-emerald-400 font-mono">mpcb.officer</span>
+              <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded">MPCB</span>
+            </div>
+            <h4 class="text-xs font-extrabold text-white group-hover:text-emerald-300">Er. Vivek Patil</h4>
+            <span class="text-[10px] text-slate-400 block truncate">Sub-Regional Officer (Environmental Cell)</span>
+            <span class="text-[9px] text-slate-500 mt-1 block">🔒 Sees only MPCB Consent Queries</span>
+          </div>
+
+          <!-- Card 3: MIDC -->
+          <div onclick="quickLogin('midc.officer', 'midc@123')" class="p-3.5 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/60 rounded-2xl cursor-pointer transition-all group">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-blue-400 font-mono">midc.officer</span>
+              <span class="text-[9px] bg-blue-950 text-blue-300 border border-blue-800 px-1.5 py-0.2 rounded">MIDC</span>
+            </div>
+            <h4 class="text-xs font-extrabold text-white group-hover:text-blue-300">Shri Anand Gokhale</h4>
+            <span class="text-[10px] text-slate-400 block truncate">Executive Engineer (Land & Water)</span>
+            <span class="text-[9px] text-slate-500 mt-1 block">🔒 Sees only MIDC Plot Queries</span>
+          </div>
+
+          <!-- Card 4: MSEDCL Power -->
+          <div onclick="quickLogin('msedcl.officer', 'power@123')" class="p-3.5 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-yellow-500/60 rounded-2xl cursor-pointer transition-all group">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-yellow-400 font-mono">msedcl.officer</span>
+              <span class="text-[9px] bg-yellow-950 text-yellow-300 border border-yellow-800 px-1.5 py-0.2 rounded">Power</span>
+            </div>
+            <h4 class="text-xs font-extrabold text-white group-hover:text-yellow-300">Er. Nitin Shinde</h4>
+            <span class="text-[10px] text-slate-400 block truncate">Superintending Engineer (HT Load)</span>
+            <span class="text-[9px] text-slate-500 mt-1 block">🔒 Sees only Power Connection Queries</span>
+          </div>
+
+          <!-- Card 5: Fire NOC -->
+          <div onclick="quickLogin('fire.officer', 'fire@123')" class="p-3.5 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-rose-500/60 rounded-2xl cursor-pointer transition-all group">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-rose-400 font-mono">fire.officer</span>
+              <span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-1.5 py-0.2 rounded">Fire NOC</span>
+            </div>
+            <h4 class="text-xs font-extrabold text-white group-hover:text-rose-300">Chief Officer M. Kadam</h4>
+            <span class="text-[10px] text-slate-400 block truncate">Directorate of Fire Services</span>
+            <span class="text-[9px] text-slate-500 mt-1 block">🔒 Sees only Fire Safety Queries</span>
+          </div>
+
+          <!-- Card 6: Super Admin -->
+          <div onclick="quickLogin('super.admin', 'admin@123')" class="p-3.5 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-purple-500/60 rounded-2xl cursor-pointer transition-all group">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-purple-400 font-mono">super.admin</span>
+              <span class="text-[9px] bg-purple-950 text-purple-300 border border-purple-800 px-1.5 py-0.2 rounded">All Desks</span>
+            </div>
+            <h4 class="text-xs font-extrabold text-white group-hover:text-purple-300">Adv. Radhika Kulkarni</h4>
+            <span class="text-[10px] text-slate-400 block truncate">Single Window Commissioner</span>
+            <span class="text-[9px] text-purple-400 mt-1 block">👑 Statewide Oversight Access</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- VIEW 2: OFFICER WORKSTATION (ISOLATED BY DEPARTMENT) -->
+  <main id="portalView" class="flex-1 flex flex-col min-h-0 hidden">
+    <!-- Department Access Banner -->
+    <div class="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-xs text-slate-300">
+          Logged in Desk: <strong id="currentDeptLabel" class="text-amber-400">PSI-2019 Subsidies</strong>
+        </span>
+        <span id="isolationBadge" class="text-[10px] bg-emerald-950 border border-emerald-800 text-emerald-300 px-2 py-0.5 rounded-full font-bold">
+          🔒 Strict Query Isolation Active
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-slate-400">Feed Refresh:</span>
+        <span class="text-emerald-400 font-mono font-bold">Every 3s</span>
+      </div>
+    </div>
+
+    <!-- Main Workspace (2-Column Grid) -->
+    <div class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
+      
+      <!-- Left Column: Tickets Queue (5 cols) -->
+      <div class="lg:col-span-5 flex flex-col bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+        <div class="p-4 border-b border-slate-800 bg-slate-950 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              Departmental Inbox (<span id="ticketCountBadge">0</span>)
+            </h2>
+            <button onclick="fetchOfficerTickets()" class="text-[11px] text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer">
+              🔄 Refresh
+            </button>
+          </div>
+
+          <div class="relative">
+            <input type="text" id="ticketSearch" oninput="filterTicketsList()" placeholder="Search inquiry, entity, applicant..." class="w-full text-xs bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500" />
+          </div>
+
+          <div class="flex gap-2">
+            <select id="statusFilter" onchange="onFilterChange()" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-300 text-xs focus:outline-none">
+              <option value="All">All Statuses</option>
+              <option value="PENDING">Pending Review</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="RESOLVED">Resolved</option>
+            </select>
+            <select id="deskDeptFilter" onchange="onDepartmentFilterChange()" class="flex-1 bg-slate-900 border border-amber-600/60 rounded-lg px-2 py-1.5 text-amber-300 text-xs focus:outline-none hidden">
+              <option value="All">All Desks (Statewide)</option>
+              <option value="PSI-2019 Subsidies">PSI-2019 Subsidies</option>
+              <option value="MPCB Environmental Consents">MPCB Consents</option>
+              <option value="MIDC Land Allotment">MIDC Land</option>
+              <option value="MSEDCL Power Connection">Power Connection</option>
+              <option value="Fire Safety NOC">Fire Safety NOC</option>
+              <option value="General Inquiries">General Desk</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Ticket Cards Scroll List -->
+        <div id="ticketsList" class="flex-1 overflow-y-auto divide-y divide-slate-800 min-h-[300px] max-h-[calc(100vh-280px)]">
+          <div class="p-8 text-center text-slate-500 text-xs">Loading departmental inquiries...</div>
+        </div>
+      </div>
+
+      <!-- Right Column: Inspection & Reply Desk (7 cols) -->
+      <div class="lg:col-span-7 flex flex-col bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl min-h-[550px]">
+        
+        <div id="activeTicketPane" class="flex-1 flex flex-col min-h-0 hidden">
+          <!-- Ticket Header with Stage & Entity Info -->
+          <div class="p-4 sm:p-5 border-b border-slate-800 bg-slate-950 space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <span id="detailTicketId" class="font-mono text-sm font-black text-amber-400 bg-amber-950/80 border border-amber-800/80 px-2.5 py-0.5 rounded-lg">
+                  TKT-2026-XXXX
+                </span>
+                <span id="detailDept" class="text-xs text-slate-400 font-semibold">Department</span>
+              </div>
+
+              <!-- Status Toggle -->
+              <div class="flex items-center gap-1.5 text-xs">
+                <button onclick="setTicketStatus('PENDING')" id="statusPendingBtn" class="px-2.5 py-1 rounded-lg border text-[10px] font-bold cursor-pointer transition-colors bg-slate-800 text-slate-400 border-slate-700">Pending</button>
+                <button onclick="setTicketStatus('IN_PROGRESS')" id="statusProgressBtn" class="px-2.5 py-1 rounded-lg border text-[10px] font-bold cursor-pointer transition-colors bg-slate-800 text-slate-400 border-slate-700">In Progress</button>
+                <button onclick="setTicketStatus('RESOLVED')" id="statusResolvedBtn" class="px-2.5 py-1 rounded-lg border text-[10px] font-bold cursor-pointer transition-colors bg-slate-800 text-slate-400 border-slate-700">Resolved</button>
+              </div>
+            </div>
+
+            <h3 id="detailSubject" class="text-sm sm:text-base font-extrabold text-white">Inquiry Subject</h3>
+
+            <!-- Stage & Profile Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs bg-slate-900 border border-slate-800 rounded-xl p-3 text-slate-300">
+              <div>
+                <span class="text-[10px] text-slate-500 block font-semibold">Applicant</span>
+                <span id="detailApplicant" class="font-bold text-white block truncate">Name</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block font-semibold">Enterprise</span>
+                <span id="detailEntity" class="font-bold text-white block truncate">Entity</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block font-semibold">Applicant Stage</span>
+                <span id="detailStage" class="inline-block text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700">
+                  Pre-Establishment
+                </span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block font-semibold">District / Taluka</span>
+                <span id="detailDistrict" class="font-bold text-white block truncate">District</span>
+              </div>
+            </div>
+
+            <!-- Tab Switcher (Chat vs Forms) -->
+            <div class="flex gap-4 text-xs font-bold border-b border-slate-800 pt-1">
+              <button onclick="switchWorkspaceTab('chat')" id="tabChatBtn" class="pb-2 border-b-2 border-amber-500 text-amber-400 flex items-center gap-1.5 cursor-pointer">
+                💬 <span>Live Discussion</span>
+              </button>
+              <button onclick="switchWorkspaceTab('forms')" id="tabFormsBtn" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 cursor-pointer">
+                📄 <span>Submitted Forms (<span id="submittedFormsCount">0</span>)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 1: LIVE DISCUSSION -->
+          <div id="workspaceChatPane" class="flex-1 flex flex-col min-h-0">
+            <!-- Messages Stream -->
+            <div id="messagesStream" class="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4 bg-slate-950/40 min-h-[200px] max-h-[350px]">
+            </div>
+
+            <!-- Canned Responses -->
+            <div class="p-2.5 bg-slate-900 border-t border-slate-800">
+              <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block mb-1">Canned Official Responses:</span>
+              <div class="flex flex-wrap gap-1.5" id="cannedRepliesContainer">
+                <button onclick="insertCanned('Namaskar. Your application has been reviewed under official gazette guidelines. Please upload your audited project report via MAITRI.')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-300 cursor-pointer">
+                  ✅ Scrutiny Completed
+                </button>
+                <button onclick="insertCanned('Clarification needed: Please provide your 19-digit Udyam Registration number and MIDC plot allotment order.')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-300 cursor-pointer">
+                  🔍 Documents Needed
+                </button>
+                <button onclick="insertCanned('Under PSI-2019 guidelines, your unit qualifies for Zone D+ capital subsidy. Sanction order has been dispatched.')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-300 cursor-pointer">
+                  💰 Zone D+ Approved
+                </button>
+              </div>
+            </div>
+
+            <!-- Reply Form -->
+            <form onsubmit="handleSendOfficerReply(event)" class="p-4 bg-slate-950 border-t border-slate-800 flex flex-col gap-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-400">
+                  Replying as: <strong class="text-emerald-400" id="replyingOfficerName">Officer</strong>
+                </span>
+
+                <!-- File upload button -->
+                <div>
+                  <input type="file" id="officerFileInput" onchange="handleOfficerFileSelected(event)" class="hidden" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" />
+                  <button type="button" onclick="document.getElementById('officerFileInput').click()" class="text-[11px] text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1 cursor-pointer">
+                    📎 <span>Attach Official Sanction / PDF</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Attached file chip -->
+              <div id="attachmentChip" class="p-2 bg-slate-800 border border-slate-700 rounded-xl text-xs flex items-center justify-between hidden">
+                <span class="text-amber-400 font-bold" id="attachmentName">file.pdf</span>
+                <button type="button" onclick="clearOfficerAttachment()" class="text-slate-400 hover:text-white px-1 cursor-pointer">✕</button>
+              </div>
+
+              <div class="flex gap-2">
+                <textarea id="officerReplyText" rows="2" placeholder="Enter official directions, instructions, or resolution remarks..." class="flex-1 text-xs bg-slate-900 border border-slate-700 rounded-xl p-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"></textarea>
+                <button type="submit" id="sendReplyBtn" class="px-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer">
+                  Send Reply
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 2: SUBMITTED FORMS INSPECTOR -->
+          <div id="workspaceFormsPane" class="flex-1 p-5 overflow-y-auto space-y-3 bg-slate-950/60 hidden">
+            <h4 class="text-xs font-black uppercase text-amber-400 tracking-wider">
+              Submitted Combined Application Forms (CAF)
+            </h4>
+            <div id="formsContainer" class="space-y-3">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State When No Ticket Selected -->
+        <div id="emptyTicketPane" class="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-500">
+          <div class="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-3 text-2xl">
+            🏛️
+          </div>
+          <h3 class="text-sm font-bold text-slate-300 mb-1">No Inquiry Selected</h3>
+          <p class="text-xs text-slate-500 max-w-sm">
+            Select an inquiry ticket from your departmental queue on the left to inspect applicant stage, submitted statutory forms, and send official replies.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Form Field Inspector Modal -->
+  <div id="fieldInspectorModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div>
+          <span class="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider block">Statutory Submission Data Blueprint</span>
+          <h3 class="text-sm font-extrabold text-white" id="modalFormName">Form Name</h3>
+        </div>
+        <button onclick="closeFieldModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer">✕</button>
+      </div>
+      <div class="flex-1 p-5 overflow-y-auto space-y-3 text-xs" id="modalFormFields">
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT JAVASCRIPT APPLICATION -->
+  <script>
+    const API_BASE = "http://localhost:8000";
+    let currentOfficer = null;
+    let allTickets = [];
+    let activeTicket = null;
+    let pendingAttachment = null;
+    let pollingInterval = null;
+
+    // Clock
+    setInterval(() => {
+      const d = new Date();
+      document.getElementById('headerClock').innerText = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }, 1000);
+
+    // Initial check for logged in officer in sessionStorage
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = sessionStorage.getItem('maitri_officer');
+      if (saved) {
+        try {
+          currentOfficer = JSON.parse(saved);
+          showPortalView();
+        } catch(e) {
+          showLoginView();
+        }
+      } else {
+        showLoginView();
+      }
+    });
+
+    function showLoginView() {
+      if (pollingInterval) clearInterval(pollingInterval);
+      document.getElementById('loginView').classList.remove('hidden');
+      document.getElementById('portalView').classList.add('hidden');
+      document.getElementById('officerHeaderProfile').classList.add('hidden');
+    }
+
+    function showPortalView() {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('portalView').classList.remove('hidden');
+      document.getElementById('officerHeaderProfile').classList.remove('hidden');
+
+      // Populate officer profile
+      document.getElementById('officerName').innerText = currentOfficer.name;
+      document.getElementById('officerDept').innerText = currentOfficer.department;
+      document.getElementById('officerAvatar').innerText = currentOfficer.avatar || 'OF';
+      document.getElementById('currentDeptLabel').innerText = currentOfficer.department === 'All' ? 'Statewide Commissioner Oversight (All Desks)' : currentOfficer.department;
+      document.getElementById('replyingOfficerName').innerText = `${currentOfficer.name} (${currentOfficer.designation})`;
+
+      // Department filter visibility for Super Admin
+      const deskFilter = document.getElementById('deskDeptFilter');
+      if (currentOfficer.department === 'All') {
+        deskFilter.classList.remove('hidden');
+        deskFilter.value = 'All';
+      } else {
+        deskFilter.classList.add('hidden');
+      }
+
+      // Reset previous opened chat whenever entering portal view for a desk
+      activeTicket = null;
+      document.getElementById('activeTicketPane').classList.add('hidden');
+      document.getElementById('emptyTicketPane').classList.remove('hidden');
+      document.getElementById('messagesStream').innerHTML = '';
+
+      // Fetch tickets strictly for this department
+      fetchOfficerTickets();
+      if (pollingInterval) clearInterval(pollingInterval);
+      pollingInterval = setInterval(fetchOfficerTickets, 3000);
+    }
+
+    async function quickLogin(username, password) {
+      closeSwitchDeskModal();
+      activeTicket = null;
+      document.getElementById('activeTicketPane').classList.add('hidden');
+      document.getElementById('emptyTicketPane').classList.remove('hidden');
+      document.getElementById('messagesStream').innerHTML = '';
+      document.getElementById('loginUsername').value = username;
+      document.getElementById('loginPassword').value = password;
+      await executeLogin(username, password);
+    }
+
+    async function handleFormLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUsername').value.trim();
+      const p = document.getElementById('loginPassword').value.trim();
+      await executeLogin(u, p);
+    }
+
+    async function executeLogin(username, password) {
+      const errBox = document.getElementById('loginError');
+      errBox.classList.add('hidden');
+      activeTicket = null;
+      document.getElementById('activeTicketPane').classList.add('hidden');
+      document.getElementById('emptyTicketPane').classList.remove('hidden');
+      document.getElementById('messagesStream').innerHTML = '';
+      try {
+        const res = await fetch(`${API_BASE}/api/support/officer-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ detail: 'Authentication failed' }));
+          throw new Error(err.detail || 'Login failed');
+        }
+        const data = await res.json();
+        currentOfficer = data.officer;
+        sessionStorage.setItem('maitri_officer', JSON.stringify(currentOfficer));
+        showPortalView();
+      } catch (err) {
+        errBox.innerText = err.message;
+        errBox.classList.remove('hidden');
+      }
+    }
+
+    function logoutOfficer() {
+      sessionStorage.removeItem('maitri_officer');
+      currentOfficer = null;
+      activeTicket = null;
+      document.getElementById('activeTicketPane').classList.add('hidden');
+      document.getElementById('emptyTicketPane').classList.remove('hidden');
+      document.getElementById('messagesStream').innerHTML = '';
+      showLoginView();
+    }
+
+    function openSwitchDeskModal() {
+      document.getElementById('switchDeskModal').classList.remove('hidden');
+    }
+
+    function closeSwitchDeskModal() {
+      document.getElementById('switchDeskModal').classList.add('hidden');
+    }
+
+    function onFilterChange() {
+      fetchOfficerTickets();
+    }
+
+    function onDepartmentFilterChange() {
+      // Clear opened chat immediately when changing department filter
+      activeTicket = null;
+      document.getElementById('activeTicketPane').classList.add('hidden');
+      document.getElementById('emptyTicketPane').classList.remove('hidden');
+      document.getElementById('messagesStream').innerHTML = '';
+      fetchOfficerTickets();
+    }
+
+    // Fetch tickets strictly isolated by department
+    async function fetchOfficerTickets() {
+      if (!currentOfficer) return;
+      try {
+        let dept = currentOfficer.department;
+        const deskFilter = document.getElementById('deskDeptFilter');
+        if (currentOfficer.department === 'All' && deskFilter && deskFilter.value !== 'All') {
+          dept = deskFilter.value;
+        }
+
+        const deptParam = dept === 'All' ? '' : encodeURIComponent(dept);
+        const statusParam = document.getElementById('statusFilter').value;
+        let url = `${API_BASE}/api/support/tickets?`;
+        if (deptParam) url += `department=${deptParam}&`;
+        if (statusParam && statusParam !== 'All') url += `status=${encodeURIComponent(statusParam)}&`;
+
+        const res = await fetch(url);
+        if (!res.ok) return;
+        allTickets = await res.json();
+        document.getElementById('ticketCountBadge').innerText = allTickets.length;
+        renderTicketsList();
+
+        // Safety check: ensure activeTicket actually belongs to the current department ticket list!
+        const activeStillInQueue = activeTicket && allTickets.some(t => t.ticket_id === activeTicket.ticket_id);
+        if (activeStillInQueue) {
+          refreshActiveTicketDetail(activeTicket.ticket_id);
+        } else if (allTickets.length > 0) {
+          selectTicket(allTickets[0].ticket_id);
+        } else {
+          activeTicket = null;
+          document.getElementById('activeTicketPane').classList.add('hidden');
+          document.getElementById('emptyTicketPane').classList.remove('hidden');
+        }
+      } catch (e) {
+        console.error("Failed to load tickets:", e);
+      }
+    }
+
+    function renderTicketsList() {
+      const container = document.getElementById('ticketsList');
+      const search = document.getElementById('ticketSearch').value.toLowerCase();
+      const filtered = allTickets.filter(t => {
+        if (!search) return true;
+        return t.ticket_id.toLowerCase().includes(search) ||
+               t.applicant_name.toLowerCase().includes(search) ||
+               t.entity_name.toLowerCase().includes(search) ||
+               t.subject.toLowerCase().includes(search) ||
+               (t.current_stage && t.current_stage.toLowerCase().includes(search));
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs">No inquiries in your departmental queue.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(t => {
+        const isSelected = activeTicket && activeTicket.ticket_id === t.ticket_id;
+        const statusBadge = t.status === 'RESOLVED' ?
+          '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">Resolved</span>' :
+          (t.status === 'IN_PROGRESS' ?
+            '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-800">In Progress</span>' :
+            '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800 animate-pulse">Pending Review</span>');
+
+        return `
+          <div onclick="selectTicket('${t.ticket_id}')" class="p-4 cursor-pointer transition-colors ${isSelected ? 'bg-amber-950/20 border-l-4 border-amber-500' : 'hover:bg-slate-800/60 border-l-4 border-transparent'}">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-bold text-blue-400">${t.ticket_id}</span>
+                ${t.current_stage ? `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">${t.current_stage}</span>` : ''}
+              </div>
+              ${statusBadge}
+            </div>
+            <h4 class="text-xs font-bold text-white line-clamp-1 mb-1">${t.subject}</h4>
+            <div class="flex items-center justify-between text-[11px] text-slate-400">
+              <span class="font-medium text-slate-300 truncate max-w-[200px]">${t.entity_name}</span>
+              <span>${t.district || 'Maharashtra'}</span>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-slate-500 mt-1">
+              <span class="bg-slate-950 px-2 py-0.5 rounded text-slate-400">${t.department}</span>
+              <span>${t.created_at.split(' ')[1] || t.created_at}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterTicketsList() {
+      renderTicketsList();
+    }
+
+    async function selectTicket(ticketId) {
+      try {
+        const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}`);
+        if (!res.ok) return;
+        activeTicket = await res.json();
+        renderActiveTicketWorkspace();
+        renderTicketsList();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function refreshActiveTicketDetail(ticketId) {
+      try {
+        const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(ticketId)}`);
+        if (!res.ok) return;
+        activeTicket = await res.json();
+        renderActiveTicketWorkspace();
+      } catch (e) {}
+    }
+
+    function renderActiveTicketWorkspace() {
+      if (!activeTicket) return;
+      document.getElementById('emptyTicketPane').classList.add('hidden');
+      document.getElementById('activeTicketPane').classList.remove('hidden');
+
+      document.getElementById('detailTicketId').innerText = activeTicket.ticket_id;
+      document.getElementById('detailDept').innerText = activeTicket.department;
+      document.getElementById('detailSubject').innerText = activeTicket.subject;
+      document.getElementById('detailApplicant').innerText = activeTicket.applicant_name;
+      document.getElementById('detailEntity').innerText = activeTicket.entity_name;
+      document.getElementById('detailStage').innerText = activeTicket.current_stage || 'Pre-Establishment';
+      document.getElementById('detailDistrict').innerText = activeTicket.district || 'Maharashtra';
+      document.getElementById('submittedFormsCount').innerText = activeTicket.submitted_forms ? activeTicket.submitted_forms.length : 0;
+
+      // Update status buttons highlight
+      const pBtn = document.getElementById('statusPendingBtn');
+      const progBtn = document.getElementById('statusProgressBtn');
+      const resBtn = document.getElementById('statusResolvedBtn');
+      pBtn.className = activeTicket.status === 'PENDING' ? 'px-2.5 py-1 rounded-lg border text-[10px] font-bold bg-amber-600 text-white border-amber-500' : 'px-2.5 py-1 rounded-lg border text-[10px] font-bold bg-slate-800 text-slate-400 border-slate-700';
+      progBtn.className = activeTicket.status === 'IN_PROGRESS' ? 'px-2.5 py-1 rounded-lg border text-[10px] font-bold bg-blue-600 text-white border-blue-500' : 'px-2.5 py-1 rounded-lg border text-[10px] font-bold bg-slate-800 text-slate-400 border-slate-700';
+      resBtn.className = activeTicket.status === 'RESOLVED' ? 'px-2.5 py-1 rounded-lg border text-[10px] font-bold bg-emerald-600 text-white border-emerald-500' : 'px-2.5 py-1 rounded-lg border text-[10px] font-bold bg-slate-800 text-slate-400 border-slate-700';
+
+      // Render Messages
+      const msgContainer = document.getElementById('messagesStream');
+      msgContainer.innerHTML = (activeTicket.messages || []).map(m => {
+        const isOfficer = m.sender === 'officer';
+        const isSystem = m.sender === 'system';
+
+        if (isSystem) {
+          return `
+            <div class="flex justify-center my-2">
+              <div class="bg-slate-850 border border-slate-700 rounded-full px-4 py-1 text-[10px] text-slate-400 text-center shadow-xs">
+                ${m.text}
+              </div>
+            </div>
+          `;
+        }
+
+        const attachmentHtml = m.attachment_name ? `
+          <div class="mt-2 p-2 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 truncate">
+              <span class="text-sm">${m.attachment_type && m.attachment_type.startsWith('image/') ? '🖼️' : '📄'}</span>
+              <span class="text-[11px] font-bold text-white truncate">${m.attachment_name}</span>
+            </div>
+            ${m.attachment_data ? `<a href="${m.attachment_data}" download="${m.attachment_name}" target="_blank" class="px-2 py-0.5 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold rounded">View</a>` : ''}
+          </div>
+        ` : '';
+
+        return `
+          <div class="flex ${isOfficer ? 'justify-end' : 'justify-start'}">
+            <div class="max-w-[85%] rounded-2xl p-4 shadow-md ${isOfficer ? 'bg-gradient-to-r from-emerald-950 to-teal-950 border border-emerald-700/60 text-white rounded-br-none' : 'bg-slate-850 border border-slate-700 text-slate-100 rounded-bl-none'}">
+              <div class="flex items-center gap-2 mb-1 border-b border-white/10 pb-1">
+                <span class="text-[11px] font-black ${isOfficer ? 'text-emerald-400' : 'text-blue-400'}">${isOfficer ? '🏛️ ' + m.sender_name : m.sender_name}</span>
+                <span class="text-[9px] text-slate-400">(${m.sender_title || 'Officer'})</span>
+                <span class="text-[9px] text-slate-500 ml-auto">${m.created_at}</span>
+              </div>
+              <p class="text-xs leading-relaxed whitespace-pre-wrap">${m.text}</p>
+              ${attachmentHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Submitted Forms
+      const formsContainer = document.getElementById('formsContainer');
+      if (!activeTicket.submitted_forms || activeTicket.submitted_forms.length === 0) {
+        formsContainer.innerHTML = `
+          <div class="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl">
+            <p class="text-xs font-bold text-slate-300">No Forms Submitted</p>
+            <p class="text-[10px] text-slate-500">Applicant has not completed statutory application forms yet.</p>
+          </div>
+        `;
+      } else {
+        formsContainer.innerHTML = activeTicket.submitted_forms.map((f, idx) => `
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-mono text-[10px] font-black text-amber-400 bg-amber-950 px-2 py-0.5 rounded border border-amber-800">${f.form_number || 'CAF'}</span>
+                  <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-800">${f.status || 'SUBMITTED'}</span>
+                </div>
+                <h5 class="text-xs font-bold text-white">${f.form_name}</h5>
+              </div>
+              <span class="text-[10px] text-slate-500">${f.created_at}</span>
+            </div>
+            <button onclick="openFormModal(${idx})" class="text-[11px] font-bold text-blue-400 hover:text-blue-300 cursor-pointer">
+              Inspect Form Parameters →
+            </button>
+          </div>
+        `).join('');
+      }
+    }
+
+    function switchWorkspaceTab(tab) {
+      if (tab === 'chat') {
+        document.getElementById('workspaceChatPane').classList.remove('hidden');
+        document.getElementById('workspaceFormsPane').classList.add('hidden');
+        document.getElementById('tabChatBtn').className = 'pb-2 border-b-2 border-amber-500 text-amber-400 flex items-center gap-1.5 cursor-pointer';
+        document.getElementById('tabFormsBtn').className = 'pb-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 cursor-pointer';
+      } else {
+        document.getElementById('workspaceChatPane').classList.add('hidden');
+        document.getElementById('workspaceFormsPane').classList.remove('hidden');
+        document.getElementById('tabChatBtn').className = 'pb-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 cursor-pointer';
+        document.getElementById('tabFormsBtn').className = 'pb-2 border-b-2 border-amber-500 text-amber-400 flex items-center gap-1.5 cursor-pointer';
+      }
+    }
+
+    function insertCanned(text) {
+      document.getElementById('officerReplyText').value = text;
+    }
+
+    function handleOfficerFileSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingAttachment = {
+          name: file.name,
+          type: file.type || 'application/octet-stream',
+          data: reader.result,
+          size: file.size
+        };
+        document.getElementById('attachmentName').innerText = file.name;
+        document.getElementById('attachmentChip').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearOfficerAttachment() {
+      pendingAttachment = null;
+      document.getElementById('officerFileInput').value = '';
+      document.getElementById('attachmentChip').classList.add('hidden');
+    }
+
+    async function handleSendOfficerReply(e) {
+      e.preventDefault();
+      const text = document.getElementById('officerReplyText').value.trim();
+      if (!text && !pendingAttachment) return;
+      if (!activeTicket) return;
+
+      const payload = {
+        sender: 'officer',
+        sender_name: currentOfficer.name,
+        sender_title: `${currentOfficer.designation} (${currentOfficer.department})`,
+        text: text || `Attached official file: ${pendingAttachment.name}`,
+        attachment_name: pendingAttachment ? pendingAttachment.name : null,
+        attachment_type: pendingAttachment ? pendingAttachment.type : null,
+        attachment_data: pendingAttachment ? pendingAttachment.data : null,
+        attachment_size: pendingAttachment ? pendingAttachment.size : null
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(activeTicket.ticket_id)}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Failed to send message");
+        document.getElementById('officerReplyText').value = '';
+        clearOfficerAttachment();
+        await refreshActiveTicketDetail(activeTicket.ticket_id);
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function setTicketStatus(newStatus) {
+      if (!activeTicket) return;
+      try {
+        await fetch(`${API_BASE}/api/support/tickets/${encodeURIComponent(activeTicket.ticket_id)}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus, assigned_officer: currentOfficer.name })
+        });
+        await refreshActiveTicketDetail(activeTicket.ticket_id);
+        await fetchOfficerTickets();
+      } catch (e) {
+        alert("Failed to update status");
+      }
+    }
+
+    function openFormModal(idx) {
+      const form = activeTicket.submitted_forms[idx];
+      if (!form) return;
+      document.getElementById('modalFormName').innerText = form.form_name;
+      const fieldsDiv = document.getElementById('modalFormFields');
+      const values = form.collected_values || {};
+      fieldsDiv.innerHTML = Object.entries(values).map(([k, v]) => `
+        <div class="flex justify-between p-2.5 bg-slate-950 border border-slate-800 rounded-xl">
+          <span class="text-slate-400 font-mono text-[11px]">${k}</span>
+          <span class="text-white font-bold text-[11px] text-right">${v}</span>
+        </div>
+      `).join('');
+      document.getElementById('fieldInspectorModal').classList.remove('hidden');
+    }
+
+    function closeFieldModal() {
+      document.getElementById('fieldInspectorModal').classList.add('hidden');
+    }
+  </script>
+
+  <!-- MODAL: QUICK SWITCH DEPARTMENT DESK -->
+  <div id="switchDeskModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-sm font-black text-white">🔄 Switch Department Desk</h3>
+          <span class="text-[10px] text-slate-400">Instantly switch workstation and isolated inquiries</span>
+        </div>
+        <button onclick="closeSwitchDeskModal()" class="text-slate-400 hover:text-white text-lg font-bold cursor-pointer">✕</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-left">
+        <div onclick="quickLogin('psi.officer', 'psi@123')" class="p-3 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-amber-500 rounded-xl cursor-pointer transition-all">
+          <span class="text-[10px] font-bold text-amber-400 font-mono block">psi.officer</span>
+          <span class="text-xs font-bold text-white block">Shri Sanjay Deshmukh</span>
+          <span class="text-[9px] text-slate-400">PSI-2019 Subsidies</span>
+        </div>
+        <div onclick="quickLogin('mpcb.officer', 'mpcb@123')" class="p-3 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500 rounded-xl cursor-pointer transition-all">
+          <span class="text-[10px] font-bold text-emerald-400 font-mono block">mpcb.officer</span>
+          <span class="text-xs font-bold text-white block">Er. Vivek Patil</span>
+          <span class="text-[9px] text-slate-400">MPCB Consents</span>
+        </div>
+        <div onclick="quickLogin('midc.officer', 'midc@123')" class="p-3 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-blue-500 rounded-xl cursor-pointer transition-all">
+          <span class="text-[10px] font-bold text-blue-400 font-mono block">midc.officer</span>
+          <span class="text-xs font-bold text-white block">Shri Anand Gokhale</span>
+          <span class="text-[9px] text-slate-400">MIDC Land</span>
+        </div>
+        <div onclick="quickLogin('msedcl.officer', 'power@123')" class="p-3 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-yellow-500 rounded-xl cursor-pointer transition-all">
+          <span class="text-[10px] font-bold text-yellow-400 font-mono block">msedcl.officer</span>
+          <span class="text-xs font-bold text-white block">Er. Nitin Shinde</span>
+          <span class="text-[9px] text-slate-400">Power Connection</span>
+        </div>
+        <div onclick="quickLogin('fire.officer', 'fire@123')" class="p-3 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-rose-500 rounded-xl cursor-pointer transition-all">
+          <span class="text-[10px] font-bold text-rose-400 font-mono block">fire.officer</span>
+          <span class="text-xs font-bold text-white block">Chief Officer M. Kadam</span>
+          <span class="text-[9px] text-slate-400">Fire Safety NOC</span>
+        </div>
+        <div onclick="quickLogin('super.admin', 'admin@123')" class="p-3 bg-slate-850 hover:bg-slate-800 border border-slate-800 hover:border-purple-500 rounded-xl cursor-pointer transition-all">
+          <span class="text-[10px] font-bold text-purple-400 font-mono block">super.admin</span>
+          <span class="text-xs font-bold text-white block">Adv. Radhika Kulkarni</span>
+          <span class="text-[9px] text-purple-400">👑 All Desks Oversight</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
